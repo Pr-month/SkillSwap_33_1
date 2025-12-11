@@ -2,7 +2,7 @@ import { registerAs } from '@nestjs/config';
 import { DataSourceOptions } from 'typeorm';
 
 export const dbConfig = registerAs(
-  'DB',
+  'DB_CONFIG',
   (): DataSourceOptions => ({
     type: 'postgres',
     applicationName: 'skillswap',
