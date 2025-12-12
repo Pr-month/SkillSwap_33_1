@@ -7,6 +7,9 @@ import {
 } from 'typeorm';
 import { Length, IsEmail, IsOptional, IsDateString } from 'class-validator';
 
+import { Skill } from 'src/skills/entities/skill.entity';
+import { Category } from 'src/categories/entities/category.entity';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -25,8 +28,8 @@ export class User {
 
   @Column({ type: 'text', nullable: true })
   @IsOptional()
-  @Length(0, 500, {
-    message: 'Информация о себе не должна превышать 500 символов',
+  @Length(0, 1000, {
+    message: 'Информация о себе не должна превышать 1000 символов',
   })
   about: string;
 
@@ -47,15 +50,15 @@ export class User {
   @IsOptional()
   avatar: string;
 
-  @ManyToMany(() => Skill, skill => skill.owners, { eager: true })
+  @ManyToMany(() => Skill, (skill) => skill.owners)
   @JoinTable()
   skills: Skill[];
 
-  @ManyToMany(() => Category, category => category.learners, { eager: true })
+  @ManyToMany(() => Category, (category) => category.learners)
   @JoinTable()
   wantToLearn: Category[];
 
-  @ManyToMany(() => Skill, { eager: true })
+  @ManyToMany(() => Skill)
   @JoinTable()
   favoriteSkills: Skill[];
 
