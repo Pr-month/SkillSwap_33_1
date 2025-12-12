@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -22,5 +23,10 @@ export class UsersService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  // TODO: Реализовать когда будет подключена БД
+  updatePassword(userId: number, updatePasswordDto: UpdatePasswordDto) {
+    return `This action updates password for user #${userId}`;
   }
 }
