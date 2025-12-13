@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -36,8 +36,30 @@ export class UsersService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      select: [
+        'id',
+        'name',
+        'email',
+        'about',
+        'birthdate',
+        'city',
+        'gender',
+        'avatar',
+        'skills',
+        'wantToLearn',
+        'favoriteSkills',
+        'role',
+      ],
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Пользователь с ID ${id} не существует`);
+    }
+
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
