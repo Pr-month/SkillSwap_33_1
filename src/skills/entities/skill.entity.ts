@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity()
+@Entity('skills')
 export class Skill {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -22,5 +22,5 @@ export class Skill {
   //Пользователь создавший навык
   //TODO: добавить линк ManyToOne на users/entity
   @Column()
-  user: string;
+  owner: string;
 }
