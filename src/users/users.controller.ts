@@ -1,7 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 
 @Controller('users')
 export class UsersController {
@@ -30,5 +42,15 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch('me/password')
+  updatePassword(
+    @Req() req: { user: { sub: number } },
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ) {
+    const userId = req.user.sub;
+    return this.usersService.updatePassword(userId, updatePasswordDto);
   }
 }
