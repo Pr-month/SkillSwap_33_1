@@ -11,6 +11,7 @@ export const dbConfig = registerAs(
     username: process.env.DB_USERNAME || 'postgres',
     password: process.env.DB_PASSWORD || 'password',
     database: process.env.DB_NAME || 'skillswap',
-    synchronize: true,
+    synchronize: process.env.NODE_ENV !== 'production',
+    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   }),
 );
