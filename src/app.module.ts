@@ -10,9 +10,15 @@ import { dbConfig } from './config/db.config';
 import { appConfig } from './config/app.config';
 import { jwtConfig } from './config/jwt.config';
 import { type JwtConfig, type DbConfig } from './config/types';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { SkillsModule } from './skills/skills.module';
 
 @Module({
   imports: [
+    AuthModule,
+    UsersModule,
+    SkillsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, jwtConfig, dbConfig],
@@ -31,6 +37,6 @@ import { type JwtConfig, type DbConfig } from './config/types';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService],  
 })
 export class AppModule {}
