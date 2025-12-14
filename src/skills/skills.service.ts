@@ -12,15 +12,15 @@ export class SkillsService {
     return `This action returns all skills`;
   }
 
-  findOne(id: string) {
+  findOne(id: number) {
     return `This action returns a #${id} skill`;
   }
 
-  update(ownerId: string, id: string, updateSkillDto: UpdateSkillDto) {
-    return `This action updates a #${id} skill ${updateSkillDto.title} if owner is ${ownerId}`;
+  update(id: number, updateSkillDto: UpdateSkillDto) {
+    return `This action updates a #${id} skill`;
   }
 
-  remove(ownerId: string, id: string) {
-    return `This action removes a #${id} skill if owner is ${ownerId}`;
+  remove(id: number) {
+    return `This action removes a #${id} skill`;
   }
 }
