@@ -5,7 +5,11 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 @Injectable()
 export class AuthService {
   create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+    //return 'This action adds a new auth';
+    return {
+      id: Date.now(),
+      email: createAuthDto.email,
+    };
   }
 
   findAll() {
