@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import {
   Controller,
   Get,
   Post,
@@ -9,9 +10,11 @@ import { Response } from 'express';
   HttpCode,
   HttpStatus,
   UnauthorizedException,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { CreateAuthDto } from './dto/create-auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -27,9 +30,10 @@ export class AuthController {
       throw new UnauthorizedException('Неверные учетные данные');
     }
     return this.authService.login(user);
+  }
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  register(@Body() createAuthDto: CreateAuthDto) {
+  async register(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.create(createAuthDto);
   }
 
