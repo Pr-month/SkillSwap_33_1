@@ -1,13 +1,17 @@
-import 'class-validator';
-import 'passport';
-
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
+import { AppConfig } from './config/types';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-  await app.listen(process.env.PORT ?? 3000);
+  const configService = app.get(ConfigService);
+  const appConfig = configService.get<AppConfig>('APP_CONFIG');
+
+  await app.listen(appConfig?.port ?? 3000);
 }
-bootstrap();
+
+void bootstrap();
