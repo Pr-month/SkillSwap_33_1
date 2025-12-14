@@ -1,11 +1,15 @@
-import {
-  Body,
+import { Response } from 'express';
   Controller,
+  Get,
   Post,
-  Res,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
+  HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 
@@ -23,6 +27,10 @@ export class AuthController {
       throw new UnauthorizedException('Неверные учетные данные');
     }
     return this.authService.login(user);
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  register(@Body() createAuthDto: CreateAuthDto) {
+    return this.authService.create(createAuthDto);
   }
 
   @Post('logout')

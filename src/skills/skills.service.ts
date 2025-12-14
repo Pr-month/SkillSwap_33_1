@@ -4,8 +4,8 @@ import { UpdateSkillDto } from './dto/update-skill.dto';
 
 @Injectable()
 export class SkillsService {
-  create(createSkillDto: CreateSkillDto) {
-    return 'This action adds a new skill';
+  create(ownerId: string, createSkillDto: CreateSkillDto) {
+    return `This action adds a new skill ${createSkillDto.title} for owner ${ownerId}`;
   }
 
   findAll() {

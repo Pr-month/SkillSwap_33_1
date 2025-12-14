@@ -10,6 +10,21 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
+  create(createAuthDto: CreateAuthDto) {
+    //return 'This action adds a new auth';
+    return {
+      id: Date.now(),
+      email: createAuthDto.email,
+    };
+  }
+
+  findAll() {
+    return `This action returns all auth`;
+  }
+
+  findOne(id: number) {
+    return `This action returns a #${id} auth`;
+  }
 
   async validateUser(
     email: string,
