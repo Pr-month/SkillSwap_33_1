@@ -19,6 +19,25 @@ import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // Добавляем GET /users/me
+  @UseGuards(AccessTokenGuard)
+  @Get('me')
+  getMe(@Req() req: { user: { sub: number } }) {
+    const userId = req.user.sub;
+    return this.usersService.getMe(userId);
+  }
+
+  // Добавляем PATCH /users/me
+  @UseGuards(AccessTokenGuard)
+  @Patch('me')
+  updateMe(
+    @Req() req: { user: { sub: number } },
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const userId = req.user.sub;
+    return this.usersService.updateMe(userId, updateUserDto);
+  }
+
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);

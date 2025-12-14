@@ -13,6 +13,14 @@ export class UsersService {
     return `This action returns all users`;
   }
 
+  getMe(userId: number) {
+    return `This action returns current user #${userId}`;
+  }
+
+  updateMe(userId: number, updateUserDto: UpdateUserDto) {
+    return `This action updates current user #${userId}`;
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
