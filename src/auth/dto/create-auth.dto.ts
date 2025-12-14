@@ -1,4 +1,4 @@
 export class CreateAuthDto {
   //temporary
-  email: any;
+  email: string;
 }
