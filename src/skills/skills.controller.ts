@@ -1,16 +1,16 @@
 import {
-  Controller,
-  Req,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
 } from '@nestjs/common';
-import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { SkillsService } from './skills.service';
 
 //TODO: добавить гарды авторизации
 @Controller('skills')
@@ -40,12 +40,12 @@ export class SkillsController {
     @Body() updateSkillDto: UpdateSkillDto,
   ) {
     const ownerId = req.user;
-    return this.skillsService.update(id, updateSkillDto);
+    return this.skillsService.update(ownerId, id, updateSkillDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: { user: string }) {
     const ownerId = req.user;
-    return this.skillsService.remove(id);
+    return this.skillsService.remove(ownerId, id);
   }
 }
