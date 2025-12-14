@@ -9,6 +9,11 @@ import {
 import { Request, Response } from 'express';
 import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 
+export interface PostgresError extends QueryFailedError {
+  code?: string;
+  detail?: string;
+}
+
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
@@ -30,8 +35,8 @@ export class AllExceptionFilter implements ExceptionFilter {
       status = HttpStatus.PAYLOAD_TOO_LARGE;
       message = 'Payload too large';
     } else if (exception instanceof QueryFailedError) {
-      const pgCode = (exception as any).code ?? exception.driverError?.code;
-      if (pgCode === '23505') {
+      const err = exception as PostgresError;
+      if (err.code === '23505') {
         status = HttpStatus.CONFLICT;
         message = 'Duplicate entry';
       }
