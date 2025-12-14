@@ -37,6 +37,6 @@ import { SkillsModule } from './skills/skills.module';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],  
+  providers: [AppService],
 })
 export class AppModule {}

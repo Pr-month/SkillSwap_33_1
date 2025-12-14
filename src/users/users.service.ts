@@ -25,6 +25,11 @@ export class UsersService {
     return `This action removes a #${id} user`;
   }
 
+  async refresh(userId: string, newRefreshToken: string) {
+    await new Promise((r) => setTimeout(r, 500));
+    return newRefreshToken;
+  }
+
   // TODO: Реализовать когда будет подключена БД
   updatePassword(userId: number, updatePasswordDto: UpdatePasswordDto) {
     return `This action updates password for user #${userId}`;
