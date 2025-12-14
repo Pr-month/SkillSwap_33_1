@@ -2,13 +2,14 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  JoinTable,
-  ManyToMany,
+  //   JoinTable,
+  //   ManyToMany,
 } from 'typeorm';
 import { Length, IsEmail, IsOptional, IsDateString } from 'class-validator';
+import { Gender, UserRole } from '../users.enums';
 
-import { Skill } from 'src/skills/entities/skill.entity';
-import { Category } from 'src/categories/entities/category.entity';
+// import { Skill } from 'src/skills/entities/skill.entity';
+// import { Category } from 'src/categories/entities/category.entity';
 
 @Entity('users')
 export class User {
@@ -31,40 +32,44 @@ export class User {
   @Length(0, 1000, {
     message: 'Информация о себе не должна превышать 1000 символов',
   })
-  about: string;
+  about?: string;
 
   @Column({ type: 'date', nullable: true })
   @IsOptional()
   @IsDateString({}, { message: 'Неверный формат даты рождения' })
-  birthdate: Date;
-
-  @Column({ type: 'date', nullable: true })
-  @IsOptional()
-  city: string;
+  birthdate?: Date;
 
   @Column({ type: 'varchar', nullable: true })
   @IsOptional()
-  gender: string;
+  city?: string;
 
   @Column({ type: 'varchar', nullable: true })
   @IsOptional()
-  avatar: string;
+  gender?: Gender;
 
-  @ManyToMany(() => Skill, (skill) => skill.owners)
-  @JoinTable()
-  skills: Skill[];
+  @Column({ type: 'varchar', nullable: true })
+  @IsOptional()
+  avatar?: string;
 
-  @ManyToMany(() => Category, (category) => category.learners)
-  @JoinTable()
-  wantToLearn: Category[];
+  //   @ManyToMany(() => Skill, (skill) => skill.owners)
+  //   @JoinTable()
+  //   skills: Skill[];
 
-  @ManyToMany(() => Skill)
-  @JoinTable()
-  favoriteSkills: Skill[];
+  //   @ManyToMany(() => Category, (category) => category.learners)
+  //   @JoinTable()
+  //   wantToLearn: Category[];
 
-  @Column({ type: 'enum', enum: ['USER', 'ADMIN'], default: 'USER' })
-  role: 'USER' | 'ADMIN';
+  //   @ManyToMany(() => Skill)
+  //   @JoinTable()
+  //   favoriteSkills: Skill[];
 
-  @Column({ type: 'text', nullable: true })
-  refreshToken: string;
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
+
+  @Column({ type: 'text', nullable: true, default: null })
+  refreshToken?: string | null;
 }
