@@ -1,1 +1,4 @@
-export class CreateAuthDto {}
+export class CreateAuthDto {
+  //temporary
+  email: string;
+}

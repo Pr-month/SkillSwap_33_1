@@ -1,15 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { SkillsService } from './skills.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { SkillsService } from './skills.service';
 
+//TODO: добавить гарды авторизации
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
   @Post()
-  create(@Body() createSkillDto: CreateSkillDto) {
-    return this.skillsService.create(createSkillDto);
+  create(@Req() req: { user: string }, @Body() createSkillDto: CreateSkillDto) {
+    const ownerId = req.user;
+    return this.skillsService.create(ownerId, createSkillDto);
   }
 
   @Get()
@@ -18,17 +29,23 @@ export class SkillsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.skillsService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.skillsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSkillDto: UpdateSkillDto) {
-    return this.skillsService.update(+id, updateSkillDto);
+  update(
+    @Param('id') id: number,
+    @Req() req: { user: string },
+    @Body() updateSkillDto: UpdateSkillDto,
+  ) {
+    const ownerId = req.user;
+    return this.skillsService.update(ownerId, id, updateSkillDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.skillsService.remove(+id);
+  remove(@Param('id') id: number, @Req() req: { user: string }) {
+    const ownerId = req.user;
+    return this.skillsService.remove(ownerId, id);
   }
 }
