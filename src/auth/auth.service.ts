@@ -1,8 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 import { jwtConfig as jwtCnf } from 'src/config/jwt.config';
 import { JwtConfig } from 'src/config/types';
+import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
+import { CreateAuthDto } from './dto/create-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -31,5 +34,47 @@ export class AuthService {
     const { accessToken, refreshToken } = this.generateTokens(user);
     await this.usersService.refresh(user.sub, refreshToken);
     return { accessToken, refreshToken };
+  }
+  login(user: Omit<User, 'password'>) {
+    const payload = { email: user.email, sub: user.id };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<Omit<User, 'password'> | null> {
+    const user = this.usersService.findByEmail(email);
+    if (!user) {
+      return null;
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (isPasswordValid) {
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      };
+    }
+    return null;
+  }
+
+  async register(dto: CreateAuthDto) {
+    //TODO добавить await после перехода на БД
+    const existing = this.usersService.findByEmail(dto.email);
+    if (existing) {
+      throw new BadRequestException(
+        'Пользователь с таким email уже существует',
+      );
+    }
+    const hash = await bcrypt.hash(dto.password, 10);
+    //TODO добавить await после перехода на БД
+    const user = this.usersService.create({
+      ...dto,
+      password: hash,
+    });
+    return this.login(user);
   }
 }

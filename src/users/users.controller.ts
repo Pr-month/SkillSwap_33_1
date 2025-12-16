@@ -22,20 +22,20 @@ export class UsersController {
   // Добавляем GET /users/me
   @UseGuards(AccessTokenGuard)
   @Get('me')
-  getMe(@Req() req: { user: { sub: number } }) {
+  getMe(@Req() req: { user: { sub: string } }) {
     const userId = req.user.sub;
-    return this.usersService.getMe(userId);
+    return this.usersService.findOne(userId);
   }
 
   // Добавляем PATCH /users/me
   @UseGuards(AccessTokenGuard)
   @Patch('me')
   updateMe(
-    @Req() req: { user: { sub: number } },
+    @Req() req: { user: { sub: string } },
     @Body() updateUserDto: UpdateUserDto,
   ) {
     const userId = req.user.sub;
-    return this.usersService.updateMe(userId, updateUserDto);
+    return this.usersService.update(userId, updateUserDto);
   }
 
   @Post()
@@ -50,17 +50,17 @@ export class UsersController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 
   @UseGuards(AccessTokenGuard)
