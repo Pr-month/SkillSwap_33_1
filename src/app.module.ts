@@ -13,6 +13,7 @@ import { type JwtConfig, type DbConfig } from './config/types';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SkillsModule } from './skills/skills.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SkillsModule } from './skills/skills.module';
         signOptions: { expiresIn: cfg.expiresIn },
       }),
     }),
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
