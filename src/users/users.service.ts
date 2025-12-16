@@ -47,6 +47,11 @@ export class UsersService {
     return true;
   }
 
+  async refresh(userId: string, newRefreshToken: string) {
+    await new Promise((r) => setTimeout(r, 500));
+    return newRefreshToken;
+  }
+
   findByEmail(email: string): User | undefined {
     return this.users.find((user) => user.email === email);
   }

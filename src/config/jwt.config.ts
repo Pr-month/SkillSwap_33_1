@@ -1,6 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import { JwtSignOptions } from '@nestjs/jwt';
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const jwtConfig = registerAs('JWT_CONFIG', () => {
   return {
     secret: process.env.JWT_SECRET || 'jwtsecret',
