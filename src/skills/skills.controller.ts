@@ -29,13 +29,13 @@ export class SkillsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: string) {
     return this.skillsService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Req() req: { user: string },
     @Body() updateSkillDto: UpdateSkillDto,
   ) {
@@ -44,7 +44,7 @@ export class SkillsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number, @Req() req: { user: string }) {
+  remove(@Param('id') id: string, @Req() req: { user: string }) {
     const ownerId = req.user;
     return this.skillsService.remove(ownerId, id);
   }

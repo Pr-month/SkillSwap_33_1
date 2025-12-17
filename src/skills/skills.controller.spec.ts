@@ -47,13 +47,13 @@ describe('SkillsController', () => {
     expect(mockSkillsService.findAll).toHaveBeenCalled();
   });
 
-  it('calls service.findOne with number id', () => {
+  it('calls service.findOne with skill id', () => {
     const skillId = 'test-skill-id';
     controller.findOne(skillId);
     expect(mockSkillsService.findOne).toHaveBeenCalledWith(skillId);
   });
 
-  it('calls service.update with number id and dto', () => {
+  it('calls service.update with skill id and dto', () => {
     const req = { user: 'test-user-ud' };
     const skillId = 'test-skill-id';
     const dto: UpdateSkillDto = {
@@ -70,7 +70,7 @@ describe('SkillsController', () => {
     );
   });
 
-  it('calls service.remove with number id', () => {
+  it('calls service.remove with skill id', () => {
     const req = { user: 'test-user-ud' };
     const skillId = 'test-skill-id';
     controller.remove(skillId, req);
