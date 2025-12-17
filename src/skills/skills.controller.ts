@@ -6,10 +6,12 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { GetSkillsQueryDto } from './dto/get-skills-query.dto';
 import { SkillsService } from './skills.service';
 
 //TODO: добавить гарды авторизации
@@ -24,18 +26,18 @@ export class SkillsController {
   }
 
   @Get()
-  findAll() {
-    return this.skillsService.findAll();
+  findAll(@Query() query: GetSkillsQueryDto) {
+    return this.skillsService.findAll(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: string) {
     return this.skillsService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Req() req: { user: string },
     @Body() updateSkillDto: UpdateSkillDto,
   ) {
@@ -44,7 +46,7 @@ export class SkillsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number, @Req() req: { user: string }) {
+  remove(@Param('id') id: string, @Req() req: { user: string }) {
     const ownerId = req.user;
     return this.skillsService.remove(ownerId, id);
   }
