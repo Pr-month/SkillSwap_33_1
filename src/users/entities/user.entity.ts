@@ -2,11 +2,13 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
+  OneToMany,
   //   JoinTable,
   //   ManyToMany,
 } from 'typeorm';
 import { Length, IsEmail, IsOptional, IsDateString } from 'class-validator';
 import { Gender, UserRole } from '../users.enums';
+import { Skill } from 'src/skills/entities/skill.entity';
 
 // import { Skill } from 'src/skills/entities/skill.entity';
 // import { Category } from 'src/categories/entities/category.entity';
@@ -51,9 +53,8 @@ export class User {
   @IsOptional()
   avatar?: string;
 
-  //   @ManyToMany(() => Skill, (skill) => skill.owners)
-  //   @JoinTable()
-  //   skills: Skill[];
+  @OneToMany(() => Skill, (skill) => skill.owner)
+  skills: Skill[];
 
   //   @ManyToMany(() => Category, (category) => category.learners)
   //   @JoinTable()

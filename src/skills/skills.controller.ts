@@ -7,10 +7,12 @@ import {
   Patch,
   Post,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { SkillsService } from './skills.service';
+import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
 
 //TODO: добавить гарды авторизации
 @Controller('skills')
@@ -18,6 +20,7 @@ export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
   @Post()
+  @UseGuards(AccessTokenGuard)
   create(@Req() req: { user: string }, @Body() createSkillDto: CreateSkillDto) {
     const ownerId = req.user;
     return this.skillsService.create(ownerId, createSkillDto);
