@@ -13,6 +13,7 @@ import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { SkillsService } from './skills.service';
 import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
+import { TAuthResponse } from 'src/auth/types';
 
 //TODO: добавить гарды авторизации
 @Controller('skills')
@@ -21,8 +22,8 @@ export class SkillsController {
 
   @Post()
   @UseGuards(AccessTokenGuard)
-  create(@Req() req: { user: string }, @Body() createSkillDto: CreateSkillDto) {
-    const ownerId = req.user;
+  create(@Req() req: TAuthResponse, @Body() createSkillDto: CreateSkillDto) {
+    const ownerId = req.user.sub;
     return this.skillsService.create(ownerId, createSkillDto);
   }
 
