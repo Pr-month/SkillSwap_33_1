@@ -13,53 +13,30 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
+  private filterUser(user: User): Partial<User> {
+    const { password, refreshToken, ...userWithoutSensitiveData } = user;
+    return userWithoutSensitiveData;
+  }
+
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
   }
 
   async findAll(): Promise<User[]> {
-    return await this.usersRepository.find({
-      select: [
-        'id',
-        'name',
-        'email',
-        'about',
-        'birthdate',
-        'city',
-        'gender',
-        'avatar',
-        'skills',
-        'wantToLearn',
-        'favoriteSkills',
-        'role',
-      ],
-    });
+    const users = await this.usersRepository.find();
+    return users.map((user) => this.filterUser(user));
   }
 
   async findOne(id: string): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: { id },
-      select: [
-        'id',
-        'name',
-        'email',
-        'about',
-        'birthdate',
-        'city',
-        'gender',
-        'avatar',
-        'skills',
-        'wantToLearn',
-        'favoriteSkills',
-        'role',
-      ],
     });
 
     if (!user) {
       throw new NotFoundException(`Пользователь с ID ${id} не существует`);
     }
 
-    return user;
+    return this.filterUser(user);
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
