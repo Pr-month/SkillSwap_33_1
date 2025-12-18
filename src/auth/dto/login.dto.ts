@@ -1,9 +1,9 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export class CreateAuthDto {
-  //temporary
+export class LoginDto {
   @IsEmail({}, { message: 'Некорректный email' })
-  email: string;
+  email!: string;
+
   @IsNotEmpty({ message: 'Пароль обязателен' })
-  password: string;
+  password!: string;
 }

@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User } from './entities/user.entity';
 
@@ -39,16 +38,31 @@ export class UsersService {
     return this.filterUser(user);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  update(id: string, updateUserDto: UpdateUserDto): User | undefined {
+    const user = this.findOne(id);
+    if (!user) return undefined;
+    Object.assign(user, updateUserDto);
+    return user;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string): boolean {
+    const index = this.users.findIndex((user) => user.id === id);
+    if (index === -1) return false;
+    this.users.splice(index, 1);
+    return true;
   }
 
+  async refresh(userId: string, newRefreshToken: string) {
+    await new Promise((r) => setTimeout(r, 500));
+    return newRefreshToken;
+  }
+
+  findByEmail(email: string): User | undefined {
+    return this.users.find((user) => user.email === email);
+  }
   // TODO: Реализовать когда будет подключена БД
-  updatePassword(userId: number, updatePasswordDto: UpdatePasswordDto) {
+  updatePassword(userId: number, _updatePasswordDto: UpdatePasswordDto) {
+    void _updatePasswordDto; // Заглушка
     return `This action updates password for user #${userId}`;
   }
 }
