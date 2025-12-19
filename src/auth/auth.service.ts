@@ -58,6 +58,7 @@ export class AuthService {
         email: user.email,
         name: user.name,
         role: user.role,
+        skills: user.skills,
       };
     }
     return null;

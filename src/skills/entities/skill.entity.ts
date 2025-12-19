@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 
 @Entity('skills')
 export class Skill {
@@ -20,7 +21,6 @@ export class Skill {
   images: string[];
 
   //Пользователь создавший навык
-  //TODO: добавить линк ManyToOne на users/entity
-  @Column()
-  owner: string;
+  @ManyToOne(() => User, (user) => user.id)
+  owner: User;
 }
