@@ -14,6 +14,7 @@ export class UsersService {
       password: '$2b$10$hc6hOxMc0k9ib05yH2lL9.iKXgLHZ1nabXfveRG9YqQYoBZ5vQ6R2',
       name: 'Admin',
       role: UserRole.USER,
+      skills: [],
     },
   ];
 
