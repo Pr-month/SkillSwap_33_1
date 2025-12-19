@@ -1,4 +1,8 @@
-import { UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 
 import { Reflector } from '@nestjs/core';
 import { RolesGuard } from './roles.guard';
@@ -9,54 +13,82 @@ describe('RolesGuard', () => {
   let reflector: Reflector;
 
   beforeEach(() => {
-    reflector = { get: jest.fn() } as any;
+    reflector = new Reflector();
     guard = new RolesGuard(reflector);
   });
 
   it('should call handler without @Roles', () => {
     // имитируем отсутствие метаданных ролей
-    (reflector.get as jest.Mock).mockReturnValue(undefined);
+    const getSpy = jest.spyOn(reflector, 'get').mockReturnValue(undefined);
 
-    const ctx: any = {
-      switchToHttp: () => ({ getRequest: () => ({ user: { role: UserRole.USER } }) }),
-      getHandler: () => ({}),
+    const ctx: Partial<ExecutionContext> = {
+      switchToHttp: () => ({
+        getRequest: jest
+          .fn()
+          .mockReturnValue({ user: { role: UserRole.USER } }),
+        getResponse: jest.fn(),
+        getNext: jest.fn(),
+      }),
+      getHandler: jest.fn(),
     };
 
-    expect(guard.canActivate(ctx)).toBe(true);
-    expect(reflector.get).toHaveBeenCalled(); 
+    expect(guard.canActivate(ctx as ExecutionContext)).toBe(true);
+    expect(getSpy).toHaveBeenCalled();
   });
 
   it('should throw UnauthorizedException if user is not defined in request', () => {
-    (reflector.get as jest.Mock).mockReturnValue([UserRole.USER]); 
+    jest.spyOn(reflector, 'get').mockReturnValue([UserRole.USER]);
 
-    const ctx: any = {
-      getHandler: () => ({}),
-      switchToHttp: () => ({ getRequest: () => ({ user: undefined }) }),
+    const ctx: Partial<ExecutionContext> = {
+      switchToHttp: () => ({
+        getRequest: jest.fn().mockReturnValue({ user: undefined }),
+        getResponse: jest.fn(),
+        getNext: jest.fn(),
+      }),
+      getHandler: jest.fn(),
     };
 
-    expect(() => guard.canActivate(ctx)).toThrow(UnauthorizedException);
+    expect(() => guard.canActivate(ctx as ExecutionContext)).toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('should throw ForbiddenException if user does not have required role', () => {
-    (reflector.get as jest.Mock).mockReturnValue([UserRole.ADMIN]); 
-    
-    const ctx: any = {
-      getHandler: () => ({}),
-      switchToHttp: () => ({ getRequest: () => ({ user: { role: UserRole.USER } }) }),
+    jest.spyOn(reflector, 'get').mockReturnValue([UserRole.ADMIN]);
+
+    const ctx: Partial<ExecutionContext> = {
+      switchToHttp: () => ({
+        getRequest: jest
+          .fn()
+          .mockReturnValue({ user: { role: UserRole.USER } }),
+        getResponse: jest.fn(),
+        getNext: jest.fn(),
+      }),
+      getHandler: jest.fn(),
     };
 
-    expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);
+    expect(() => guard.canActivate(ctx as ExecutionContext)).toThrow(
+      ForbiddenException,
+    );
   });
 
   it('should call handler if user has required role', () => {
-    (reflector.get as jest.Mock).mockReturnValue([UserRole.ADMIN]); 
-    
-    const ctx: any = {
-      getHandler: () => ({}),
-      switchToHttp: () => ({ getRequest: () => ({ user: { role: UserRole.ADMIN } }) }),
+    const getSpy = jest
+      .spyOn(reflector, 'get')
+      .mockReturnValue([UserRole.ADMIN]);
+
+    const ctx: Partial<ExecutionContext> = {
+      switchToHttp: () => ({
+        getRequest: jest
+          .fn()
+          .mockReturnValue({ user: { role: UserRole.ADMIN } }),
+        getResponse: jest.fn(),
+        getNext: jest.fn(),
+      }),
+      getHandler: jest.fn(),
     };
 
-    expect(guard.canActivate(ctx)).toBe(true);
-    expect(reflector.get).toHaveBeenCalled(); 
+    expect(guard.canActivate(ctx as ExecutionContext)).toBe(true);
+    expect(getSpy).toHaveBeenCalled();
   });
 });

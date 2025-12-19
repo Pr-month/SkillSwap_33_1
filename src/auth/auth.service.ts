@@ -6,6 +6,7 @@ import { JwtConfig } from '../config/types';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
+import { TJwtPayload } from './types';
 
 @Injectable()
 export class AuthService {
@@ -29,8 +30,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  //Заменить на тип TJwtPayload при готовности
-  async refresh(user: { sub: string }) {
+  async refresh(user: TJwtPayload) {
     const { accessToken, refreshToken } = this.generateTokens(user);
     await this.usersService.refresh(user.sub, refreshToken);
     return { accessToken, refreshToken };
@@ -42,7 +42,7 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     };
   }
-  
+
   async validateUser(
     email: string,
     password: string,
