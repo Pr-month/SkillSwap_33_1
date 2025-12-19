@@ -1,3 +1,4 @@
+// src/skills/skills.controller.ts
 import {
   Body,
   Controller,
@@ -6,50 +7,53 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { GetSkillsQueryDto } from './dto/get-skills-query.dto';
 import { SkillsService } from './skills.service';
-import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
-import { TAuthResponse } from 'src/auth/types';
+import { TAuthResponse } from '../auth/types';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 
-//TODO: добавить гарды авторизации
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
-  @Post()
   @UseGuards(AccessTokenGuard)
+  @Post()
   create(@Req() req: TAuthResponse, @Body() createSkillDto: CreateSkillDto) {
     const ownerId = req.user.sub;
     return this.skillsService.create(ownerId, createSkillDto);
   }
 
   @Get()
-  findAll() {
-    return this.skillsService.findAll();
+  findAll(@Query() query: GetSkillsQueryDto) {
+    return this.skillsService.findAll(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: string) {
     return this.skillsService.findOne(id);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Patch(':id')
   update(
-    @Param('id') id: number,
-    @Req() req: { user: string },
+    @Param('id') id: string,
+    @Req() req: TAuthResponse,
     @Body() updateSkillDto: UpdateSkillDto,
   ) {
-    const ownerId = req.user;
-    return this.skillsService.update(ownerId, id, updateSkillDto);
+    const userId = req.user.sub;
+    return this.skillsService.update(userId, id, updateSkillDto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Delete(':id')
-  remove(@Param('id') id: number, @Req() req: { user: string }) {
-    const ownerId = req.user;
-    return this.skillsService.remove(ownerId, id);
+  remove(@Param('id') id: string, @Req() req: TAuthResponse) {
+    const userId = req.user.sub;
+    return this.skillsService.remove(userId, id);
   }
 }
