@@ -13,6 +13,7 @@ import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { GetSkillsQueryDto } from './dto/get-skills-query.dto';
 import { SkillsService } from './skills.service';
+import { TAuthResponse } from '../auth/types';
 
 //TODO: добавить гарды авторизации
 @Controller('skills')
@@ -20,8 +21,8 @@ export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
   @Post()
-  create(@Req() req: { user: string }, @Body() createSkillDto: CreateSkillDto) {
-    const ownerId = req.user;
+  create(@Req() req: TAuthResponse, @Body() createSkillDto: CreateSkillDto) {
+    const ownerId = req.user.sub;
     return this.skillsService.create(ownerId, createSkillDto);
   }
 
@@ -38,16 +39,16 @@ export class SkillsController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Req() req: { user: string },
+    @Req() req: TAuthResponse,
     @Body() updateSkillDto: UpdateSkillDto,
   ) {
-    const ownerId = req.user;
-    return this.skillsService.update(ownerId, id, updateSkillDto);
+    const userId = req.user.sub;
+    return this.skillsService.update(userId, id, updateSkillDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() req: { user: string }) {
-    const ownerId = req.user;
-    return this.skillsService.remove(ownerId, id);
+  remove(@Param('id') id: string, @Req() req: TAuthResponse) {
+    const userId = req.user.sub;
+    return this.skillsService.remove(userId, id);
   }
 }
