@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { Length, IsEmail, IsOptional, IsDateString } from 'class-validator';
 import { Gender, UserRole } from '../users.enums';
-import { Skill } from 'src/skills/entities/skill.entity';
 
 // import { Skill } from 'src/skills/entities/skill.entity';
 // import { Category } from 'src/categories/entities/category.entity';
@@ -53,16 +52,8 @@ export class User {
   @IsOptional()
   avatar?: string;
 
-  @OneToMany(() => Skill, (skill) => skill.owner)
-  skills: Skill[];
-
-  //   @ManyToMany(() => Category, (category) => category.learners)
-  //   @JoinTable()
-  //   wantToLearn: Category[];
-
-  //   @ManyToMany(() => Skill)
-  //   @JoinTable()
-  //   favoriteSkills: Skill[];
+  @OneToMany('Skill', 'owner')
+  skills: import('src/skills/entities/skill.entity').Skill[];
 
   @Column({
     type: 'enum',

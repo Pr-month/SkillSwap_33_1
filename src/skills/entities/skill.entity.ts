@@ -1,26 +1,40 @@
-import { User } from 'src/users/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
-@Entity('skills')
+@Entity()
 export class Skill {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column()
   title: string;
 
-  @Column({ type: 'text' })
-  description: string;
+  @Column({ nullable: true })
+  description?: string;
 
-  //TODO: добавить линк OneToMany на categories/entity
-  @Column({ type: 'text' })
+  @Column()
   category: string;
 
-  //Массив ссылок на изображения
-  @Column('text', { array: true, default: [] })
-  images: string[];
+  @Column({ nullable: true })
+  image?: string;
 
-  //Пользователь создавший навык
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.skills)
+  @JoinColumn({ name: 'ownerId' })
   owner: User;
+
+  ownerId: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
