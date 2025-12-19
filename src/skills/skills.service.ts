@@ -1,42 +1,81 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSkillDto } from './dto/create-skill.dto';
-import { UpdateSkillDto } from './dto/update-skill.dto';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Skill } from './entities/skill.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { CreateSkillDto } from './dto/create-skill.dto';
+import { UpdateSkillDto } from './dto/update-skill.dto';
+import { GetSkillsQueryDto } from './dto/get-skills-query.dto';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 @Injectable()
 export class SkillsService {
   constructor(
     @InjectRepository(Skill)
-    private skillsRepository: Repository<Skill>,
+    private skillRepository: Repository<Skill>,
   ) {}
 
-  async create(ownerId: string, createSkillDto: CreateSkillDto) {
-    const createdSkill = await this.skillsRepository.save({
-      title: createSkillDto.title,
-      description: createSkillDto.description,
-      category: createSkillDto.category,
-      images: createSkillDto.images,
-      owner: { id: ownerId },
+  async create(
+    ownerId: string,
+    createSkillDto: CreateSkillDto,
+  ): Promise<Skill> {
+    const skill = this.skillRepository.create({
+      ...createSkillDto,
+      ownerId,
     });
-
-    return createdSkill;
+    return this.skillRepository.save(skill);
   }
 
-  findAll() {
-    return `This action returns all skills`;
+  async findAll(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    query: GetSkillsQueryDto,
+  ): Promise<Skill[]> {
+    // TODO: реализовать пагинацию
+    return this.skillRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} skill`;
+  async findOne(id: string): Promise<Skill> {
+    const skill = await this.skillRepository.findOneBy({ id });
+    if (!skill) {
+      throw new NotFoundException(`Skill with id ${id} not found`);
+    }
+    return skill;
   }
 
-  update(ownerId: string, id: number, updateSkillDto: UpdateSkillDto) {
-    return `This action updates a #${id} skill with ${JSON.stringify(updateSkillDto)} for ${ownerId}`;
+  async update(
+    userId: string,
+    id: string,
+    updateSkillDto: UpdateSkillDto,
+  ): Promise<Skill> {
+    const skill = await this.findOne(id);
+    if (skill.ownerId !== userId) {
+      throw new ForbiddenException('You can only update your own skills');
+    }
+    Object.assign(skill, updateSkillDto);
+    return this.skillRepository.save(skill);
   }
 
-  remove(ownerId: string, id: number) {
-    return `This action removes a #${id} skill for ${ownerId}`;
+  async remove(userId: string, id: string): Promise<void> {
+    const skill = await this.findOne(id);
+
+    if (skill.ownerId !== userId) {
+      throw new ForbiddenException('You can only delete your own skills');
+    }
+
+    if (skill.image) {
+      const imagePath = path.join(process.cwd(), skill.image);
+      try {
+        await fs.access(imagePath);
+        await fs.unlink(imagePath);
+      } catch {
+        // Игнорируем ошибку удаления файла
+      }
+    }
+
+    await this.skillRepository.delete(id);
   }
 }
