@@ -8,12 +8,14 @@ import {
   Post,
   Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { GetSkillsQueryDto } from './dto/get-skills-query.dto';
 import { SkillsService } from './skills.service';
 import { TAuthResponse } from '../auth/types';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 
 //TODO: добавить гарды авторизации
 @Controller('skills')
@@ -36,6 +38,7 @@ export class SkillsController {
     return this.skillsService.findOne(id);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
