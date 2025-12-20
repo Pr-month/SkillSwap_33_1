@@ -23,12 +23,15 @@ export class SkillsService {
     ownerId: string,
     createSkillDto: CreateSkillDto,
   ): Promise<Skill> {
-    const skill = this.skillRepository.create({
-      ...createSkillDto,
+    return this.skillRepository.save({
+      title: createSkillDto.title,
+      description: createSkillDto.description,
+      images: createSkillDto.images || [],
       owner: { id: ownerId },
+      category: { id: createSkillDto.category },
     });
-    return this.skillRepository.save(skill);
   }
+
   async findAll(query: GetSkillsQueryDto) {
     const { page = 1, limit = 20, search, category } = query;
     const queryBuilder = this.skillRepository
@@ -110,7 +113,7 @@ export class SkillsService {
           await fs.access(imagePath);
           await fs.unlink(imagePath);
         } catch {
-          // Игнорируем ошибку удаления файла
+          // Файл уже удалён или не существует — игнорируем
         }
       }
     }

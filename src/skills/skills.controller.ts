@@ -34,13 +34,12 @@ export class SkillsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     return this.skillsService.findOne(id);
   }
 
   @UseGuards(AccessTokenGuard)
   @Patch(':id')
-  @UseGuards(AccessTokenGuard)
   update(
     @Param('id') id: string,
     @Req() req: TAuthResponse,
@@ -52,7 +51,7 @@ export class SkillsController {
 
   @UseGuards(AccessTokenGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() req: TAuthResponse) {
+  async remove(@Param('id') id: string, @Req() req: TAuthResponse) {
     const userId = req.user.sub;
     return this.skillsService.remove(userId, id);
   }

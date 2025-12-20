@@ -9,9 +9,15 @@ describe('SkillsService', () => {
   const mockRepository = {
     create: jest.fn(),
     save: jest.fn(),
-    find: jest.fn(),
-    findOneBy: jest.fn(),
     delete: jest.fn(),
+    findOne: jest.fn(),
+    createQueryBuilder: jest.fn().mockReturnValue({
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      take: jest.fn().mockReturnThis(),
+      getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
+    }),
   };
 
   beforeEach(async () => {
