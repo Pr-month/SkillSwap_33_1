@@ -7,6 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
 
 @Entity('skills')
@@ -20,11 +21,12 @@ export class Skill {
   @Column({ nullable: true })
   description?: string;
 
-  @Column()
-  category: string;
+  @ManyToOne(() => Category, { eager: true })
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
 
-  @Column({ nullable: true })
-  image?: string;
+  @Column('text', { array: true, default: [] })
+  images: string[];
 
   @ManyToOne(() => User, (user) => user.skills, {
     onDelete: 'CASCADE',
