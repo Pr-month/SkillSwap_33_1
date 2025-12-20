@@ -14,6 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { TAuthResponse } from 'src/auth/types';
 
 @Controller('users')
 export class UsersController {
@@ -22,7 +23,7 @@ export class UsersController {
   // Добавляем GET /users/me
   @UseGuards(AccessTokenGuard)
   @Get('me')
-  getMe(@Req() req: { user: { sub: string } }) {
+  getMe(@Req() req: TAuthResponse) {
     const userId = req.user.sub;
     return this.usersService.findOne(userId);
   }
@@ -30,10 +31,7 @@ export class UsersController {
   // Добавляем PATCH /users/me
   @UseGuards(AccessTokenGuard)
   @Patch('me')
-  updateMe(
-    @Req() req: { user: { sub: string } },
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  updateMe(@Req() req: TAuthResponse, @Body() updateUserDto: UpdateUserDto) {
     const userId = req.user.sub;
     return this.usersService.update(userId, updateUserDto);
   }
@@ -53,16 +51,6 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
-  }
-
   @UseGuards(AccessTokenGuard)
   @Patch('me/password')
   updatePassword(
@@ -71,5 +59,15 @@ export class UsersController {
   ) {
     const userId = req.user.sub;
     return this.usersService.updatePassword(userId, updatePasswordDto);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(id, updateUserDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(id);
   }
 }
