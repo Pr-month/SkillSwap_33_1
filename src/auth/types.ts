@@ -1,4 +1,4 @@
-import { UserRole } from '../users/users.enums';
+import { UserRole } from './roles.enum';
 
 export type TJwtPayload = {
   sub: string;

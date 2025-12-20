@@ -1,15 +1,9 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { jwtConfig as jwtCnf } from 'src/config/jwt.config';
-import { JwtConfig } from 'src/config/types';
-import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
+import { jwtConfig as jwtCnf } from '../config/jwt.config';
+import { JwtConfig } from '../config/types';
+import { UsersService } from '../users/users.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { TJwtPayload } from './types';
@@ -22,7 +16,7 @@ export class AuthService {
     private usersService: UsersService,
   ) {}
 
-  private generateTokens(payload: any) {
+  private generateTokens(payload: TJwtPayload) {
     const accessToken = this.jwtService.sign(payload, {
       secret: this.jwtConfig.secret,
       expiresIn: this.jwtConfig.expiresIn,
@@ -45,7 +39,7 @@ export class AuthService {
   async login(loginData: LoginDto) {
     const user = await this.validateUser(loginData.email, loginData.password);
     const { accessToken, refreshToken } = await this.refresh({
-      sub: user.id,
+      sub: user.sub,
       role: user.role,
       email: user.email,
     });
@@ -55,10 +49,7 @@ export class AuthService {
     };
   }
 
-  async validateUser(
-    email: string,
-    password: string,
-  ): Promise<Omit<User, 'password'>> {
+  async validateUser(email: string, password: string): Promise<TJwtPayload> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
@@ -70,20 +61,13 @@ export class AuthService {
     }
 
     return {
-      id: user.id,
+      sub: user.id,
       email: user.email,
-      name: user.name,
       role: user.role,
     };
   }
 
   async register(dto: CreateAuthDto) {
-    const existing = await this.usersService.findByEmail(dto.email);
-    if (existing) {
-      throw new BadRequestException(
-        'Пользователь с таким email уже существует',
-      );
-    }
     const hash = await bcrypt.hash(dto.password, 10);
     const user = await this.usersService.create({
       ...dto,
