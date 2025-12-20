@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 
 import { Category } from '../../categories/entities/category.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('skills')
 export class Skill {
@@ -27,7 +28,6 @@ export class Skill {
   images: string[];
 
   //Пользователь создавший навык
-  //TODO: добавить линк ManyToOne на users/entity
-  @Column()
-  owner: string;
+  @ManyToOne(() => User, (user) => user.id)
+  owner: User;
 }

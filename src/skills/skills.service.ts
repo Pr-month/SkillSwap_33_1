@@ -17,6 +17,18 @@ export class SkillsService {
     private readonly skillRepository: Repository<Skill>,
   ) {}
 
+  async create(ownerId: string, createSkillDto: CreateSkillDto) {
+    const createdSkill = await this.skillRepository.save({
+      title: createSkillDto.title,
+      description: createSkillDto.description,
+      category: { id: createSkillDto.category },
+      images: createSkillDto.images,
+      owner: { id: ownerId },
+    });
+
+    return createdSkill;
+  }
+
   async findAll(query: GetSkillsQueryDto) {
     const { page = 1, limit = 20, search, category } = query;
     const queryBuilder = this.skillRepository
@@ -26,8 +38,8 @@ export class SkillsService {
 
     if (search) {
       queryBuilder.andWhere(
-        `(LOWER(skill.title) LIKE :search 
-          OR LOWER(category.name) LIKE :search 
+        `(LOWER(skill.title) LIKE :search
+          OR LOWER(category.name) LIKE :search
           OR LOWER(parent.name) LIKE :search)`,
         { search: `%${search.toLowerCase()}%` },
       );
@@ -61,22 +73,21 @@ export class SkillsService {
     };
   }
 
-  create(ownerId: string, createSkillDto: CreateSkillDto) {
-    return `This action adds a new skill ${createSkillDto.title} for owner ${ownerId}`;
-  }
-
   findOne(id: string) {
     return `This action returns a #${id} skill`;
   }
 
-  async update(userId: string, id: string, updateSkillDto: UpdateSkillDto) {
-    const skill = await this.skillRepository.findOne({ where: { id } });
+  async update(ownerId: string, id: string, updateSkillDto: UpdateSkillDto) {
+    const skill = await this.skillRepository.findOne({
+      where: { id },
+      relations: ['owner'],
+    });
 
     if (!skill) {
       throw new NotFoundException(`Навык с ID ${id} не найден`);
     }
 
-    if (skill.owner !== userId) {
+    if (skill.owner?.id !== ownerId) {
       throw new ForbiddenException('Вы можете обновлять только свои навыки');
     }
 

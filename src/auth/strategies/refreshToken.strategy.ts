@@ -3,11 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { jwtConfig } from '../../config/jwt.config'; // Новый импорт
 import { JwtConfig } from '../../config/types'; // Новый импорт
-
-type JwtPayload = {
-  sub: number;
-  email: string;
-};
+import { TJwtPayload } from '../types';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -21,7 +17,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     });
   }
 
-  validate(payload: JwtPayload) {
+  validate(payload: TJwtPayload) {
     return payload;
   }
 }

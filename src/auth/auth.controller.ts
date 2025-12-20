@@ -14,6 +14,7 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
+import { TJwtPayload } from './types';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +22,7 @@ export class AuthController {
 
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
-  refresh(@Request() req: Request & { user: { sub: string } }) {
+  refresh(@Request() req: Request & { user: TJwtPayload }) {
     const { user } = req;
     return this.authService.refresh(user);
   }
