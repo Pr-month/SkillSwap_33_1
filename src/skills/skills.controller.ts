@@ -14,8 +14,8 @@ import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { GetSkillsQueryDto } from './dto/get-skills-query.dto';
 import { SkillsService } from './skills.service';
-import { TAuthResponse } from '../auth/types';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { TAuthResponse } from '../auth/types';
 
 @Controller('skills')
 export class SkillsController {
@@ -40,6 +40,7 @@ export class SkillsController {
 
   @UseGuards(AccessTokenGuard)
   @Patch(':id')
+  @UseGuards(AccessTokenGuard)
   update(
     @Param('id') id: string,
     @Req() req: TAuthResponse,
