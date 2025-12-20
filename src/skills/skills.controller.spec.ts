@@ -5,7 +5,7 @@ import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { GetSkillsQueryDto } from './dto/get-skills-query.dto';
 import { TAuthResponse } from '../auth/types';
-import { UserRole } from '../users/enums';
+import { UserRole } from '../auth/roles.enum';
 
 describe('SkillsController', () => {
   let controller: SkillsController;
@@ -18,6 +18,14 @@ describe('SkillsController', () => {
     remove: jest.fn(),
   };
 
+  const authRequest: TAuthResponse = {
+    user: {
+      sub: 'test-user-id',
+      email: 'test@test.com',
+      role: UserRole.USER,
+    },
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SkillsController],
@@ -28,28 +36,22 @@ describe('SkillsController', () => {
     jest.clearAllMocks();
   });
 
-  const mockUser: TAuthResponse['user'] = {
-    sub: 'test-user-id',
-    email: 'test@example.com',
-    role: UserRole.USER,
-  };
-
-  const mockReq = { user: mockUser } as TAuthResponse;
-
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should call service.create with user.sub and dto', async () => {
+  it('should call service.create on create', async () => {
     const dto: CreateSkillDto = {
       title: 'test title A',
       description: 'test skill desc A',
       category: 'test skill category',
       images: [],
     };
-
-    await controller.create(mockReq, dto);
-    expect(mockSkillsService.create).toHaveBeenCalledWith(mockUser.sub, dto);
+    await controller.create(authRequest, dto);
+    expect(mockSkillsService.create).toHaveBeenCalledWith(
+      authRequest.user.sub,
+      dto,
+    );
   });
 
   it('should call service.findAll with query', async () => {
@@ -58,13 +60,13 @@ describe('SkillsController', () => {
     expect(mockSkillsService.findAll).toHaveBeenCalledWith(query);
   });
 
-  it('should call service.findOne with id', async () => {
+  it('calls service.findOne with skill id', async () => {
     const skillId = 'test-skill-id';
     await controller.findOne(skillId);
     expect(mockSkillsService.findOne).toHaveBeenCalledWith(skillId);
   });
 
-  it('should call service.update with user.sub, id and dto', async () => {
+  it('calls service.update with skill id and dto', async () => {
     const skillId = 'test-skill-id';
     const dto: UpdateSkillDto = {
       title: 'test title B',
@@ -72,20 +74,19 @@ describe('SkillsController', () => {
       category: 'test skill category',
       images: [],
     };
-
-    await controller.update(skillId, mockReq, dto);
+    await controller.update(skillId, authRequest, dto);
     expect(mockSkillsService.update).toHaveBeenCalledWith(
-      mockUser.sub,
+      authRequest.user.sub,
       skillId,
       dto,
     );
   });
 
-  it('should call service.remove with user.sub and skill id', async () => {
+  it('calls service.remove with skill id', async () => {
     const skillId = 'test-skill-id';
-    await controller.remove(skillId, mockReq);
+    await controller.remove(skillId, authRequest);
     expect(mockSkillsService.remove).toHaveBeenCalledWith(
-      mockUser.sub,
+      authRequest.user.sub,
       skillId,
     );
   });
