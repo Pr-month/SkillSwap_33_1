@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { jwtConfig as jwtCnf } from '../config/jwt.config';
@@ -16,7 +16,7 @@ export class AuthService {
     private usersService: UsersService,
   ) {}
 
-  private generateTokens(payload: any) {
+  private generateTokens(payload: TJwtPayload) {
     const accessToken = this.jwtService.sign(payload, {
       secret: this.jwtConfig.secret,
       expiresIn: this.jwtConfig.expiresIn,
@@ -65,13 +65,6 @@ export class AuthService {
   }
 
   async register(dto: CreateAuthDto) {
-    //TODO добавить await после перехода на БД
-    const existing = this.usersService.findByEmail(dto.email);
-    if (existing) {
-      throw new BadRequestException(
-        'Пользователь с таким email уже существует',
-      );
-    }
     const hash = await bcrypt.hash(dto.password, 10);
     //TODO добавить await после перехода на БД
     const user = this.usersService.create({

@@ -73,8 +73,10 @@ export class SkillsService {
     };
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} skill`;
+  //TODO реализовать метод
+  async findOne(id: string) {
+    console.log(`This action returns a #${id} skill`);
+    return await this.skillRepository.findOne({});
   }
 
   async update(ownerId: string, id: string, updateSkillDto: UpdateSkillDto) {
@@ -94,8 +96,9 @@ export class SkillsService {
     Object.assign(skill, updateSkillDto);
     return this.skillRepository.save(skill);
   }
-
-  remove(ownerId: string, id: string) {
-    return `This action removes a #${id} skill for ${ownerId}`;
+  //TODO добавить необходимые параметры
+  async remove(ownerId: string, id: string) {
+    console.log(`${ownerId} ${id}`);
+    return await this.skillRepository.remove([]);
   }
 }

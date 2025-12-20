@@ -53,18 +53,18 @@ describe('SkillsController', () => {
     );
   });
 
-  it('calls service.findAll', () => {
-    controller.findAll();
+  it('calls service.findAll', async () => {
+    await controller.findAll({});
     expect(mockSkillsService.findAll).toHaveBeenCalled();
   });
 
-  it('calls service.findOne with skill id', () => {
+  it('calls service.findOne with skill id', async () => {
     const skillId = 'test-skill-id';
-    controller.findOne(skillId);
+    await controller.findOne(skillId);
     expect(mockSkillsService.findOne).toHaveBeenCalledWith(skillId);
   });
 
-  it('calls service.update with skill id and dto', () => {
+  it('calls service.update with skill id and dto', async () => {
     const skillId = 'test-skill-id';
     const dto: UpdateSkillDto = {
       title: 'test title B',
@@ -72,7 +72,7 @@ describe('SkillsController', () => {
       category: 'test skill category',
       images: [],
     };
-    controller.update(skillId, authRequest, dto);
+    await controller.update(skillId, authRequest, dto);
     expect(mockSkillsService.update).toHaveBeenCalledWith(
       authRequest.user.sub,
       skillId,
@@ -80,9 +80,9 @@ describe('SkillsController', () => {
     );
   });
 
-  it('calls service.remove with skill id', () => {
+  it('calls service.remove with skill id', async () => {
     const skillId = 'test-skill-id';
-    controller.remove(skillId, authRequest);
+    await controller.remove(skillId, authRequest);
     expect(mockSkillsService.remove).toHaveBeenCalledWith(
       authRequest.user.sub,
       skillId,
