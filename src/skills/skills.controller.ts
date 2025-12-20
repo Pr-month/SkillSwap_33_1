@@ -34,7 +34,7 @@ export class SkillsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     return this.skillsService.findOne(id);
   }
 
@@ -51,8 +51,8 @@ export class SkillsController {
 
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
-  remove(@Param('id') id: string, @Req() req: TAuthResponse) {
+  async remove(@Param('id') id: string, @Req() req: TAuthResponse) {
     const ownerId = req.user.sub;
-    return this.skillsService.remove(ownerId, id);
+    return await this.skillsService.remove(ownerId, id);
   }
 }
