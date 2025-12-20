@@ -57,14 +57,6 @@ export class User {
   @OneToMany(() => Skill, (skill) => skill.owner)
   skills: Skill[];
 
-  //   @ManyToMany(() => Category, (category) => category.learners)
-  //   @JoinTable()
-  //   wantToLearn: Category[];
-
-  //   @ManyToMany(() => Skill)
-  //   @JoinTable()
-  //   favoriteSkills: Skill[];
-
   @Column({
     type: 'enum',
     enum: UserRole,

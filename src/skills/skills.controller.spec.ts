@@ -3,6 +3,7 @@ import { SkillsController } from './skills.controller';
 import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { GetSkillsQueryDto } from './dto/get-skills-query.dto';
 import { TAuthResponse } from '../auth/types';
 import { UserRole } from '../auth/roles.enum';
 
@@ -53,9 +54,10 @@ describe('SkillsController', () => {
     );
   });
 
-  it('calls service.findAll', async () => {
-    await controller.findAll({});
-    expect(mockSkillsService.findAll).toHaveBeenCalled();
+  it('should call service.findAll with query', async () => {
+    const query: GetSkillsQueryDto = { page: 1, limit: 10 };
+    await controller.findAll(query);
+    expect(mockSkillsService.findAll).toHaveBeenCalledWith(query);
   });
 
   it('calls service.findOne with skill id', async () => {

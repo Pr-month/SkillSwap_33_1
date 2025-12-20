@@ -21,8 +21,8 @@ import { TAuthResponse } from '../auth/types';
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
-  @Post()
   @UseGuards(AccessTokenGuard)
+  @Post()
   create(@Req() req: TAuthResponse, @Body() createSkillDto: CreateSkillDto) {
     const ownerId = req.user.sub;
     return this.skillsService.create(ownerId, createSkillDto);
@@ -38,21 +38,21 @@ export class SkillsController {
     return this.skillsService.findOne(id);
   }
 
-  @Patch(':id')
   @UseGuards(AccessTokenGuard)
+  @Patch(':id')
   update(
     @Param('id') id: string,
     @Req() req: TAuthResponse,
     @Body() updateSkillDto: UpdateSkillDto,
   ) {
-    const ownerId = req.user.sub;
-    return this.skillsService.update(ownerId, id, updateSkillDto);
+    const userId = req.user.sub;
+    return this.skillsService.update(userId, id, updateSkillDto);
   }
 
-  @Delete(':id')
   @UseGuards(AccessTokenGuard)
+  @Delete(':id')
   async remove(@Param('id') id: string, @Req() req: TAuthResponse) {
-    const ownerId = req.user.sub;
-    return await this.skillsService.remove(ownerId, id);
+    const userId = req.user.sub;
+    return this.skillsService.remove(userId, id);
   }
 }
