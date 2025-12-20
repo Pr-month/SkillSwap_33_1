@@ -1,5 +1,13 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+
+import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 
 @Entity('skills')
 export class Skill {
@@ -12,11 +20,10 @@ export class Skill {
   @Column({ type: 'text' })
   description: string;
 
-  //TODO: добавить линк OneToMany на categories/entity
-  @Column({ type: 'text' })
-  category: string;
+  @ManyToOne(() => Category, { eager: true })
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
 
-  //Массив ссылок на изображения
   @Column('text', { array: true, default: [] })
   images: string[];
 
