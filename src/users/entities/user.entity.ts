@@ -7,8 +7,9 @@ import {
   //   ManyToMany,
 } from 'typeorm';
 import { Length, IsEmail, IsOptional, IsDateString } from 'class-validator';
-import { Gender, UserRole } from '../users.enums';
-import { Skill } from 'src/skills/entities/skill.entity';
+import { Gender } from '../users.enums';
+import { Skill } from '../../skills/entities/skill.entity';
+import { UserRole } from '../../auth/roles.enum';
 
 // import { Skill } from 'src/skills/entities/skill.entity';
 // import { Category } from 'src/categories/entities/category.entity';

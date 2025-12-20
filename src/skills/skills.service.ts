@@ -28,15 +28,15 @@ export class SkillsService {
     return `This action returns all skills`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} skill`;
   }
 
-  update(ownerId: string, id: number, updateSkillDto: UpdateSkillDto) {
+  update(ownerId: string, id: string, updateSkillDto: UpdateSkillDto) {
     return `This action updates a #${id} skill with ${JSON.stringify(updateSkillDto)} for ${ownerId}`;
   }
 
-  remove(ownerId: string, id: number) {
+  remove(ownerId: string, id: string) {
     return `This action removes a #${id} skill for ${ownerId}`;
   }
 }

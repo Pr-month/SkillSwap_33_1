@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { UserRole } from './users.enums';
+import { UserRole } from '../auth/roles.enum';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +13,13 @@ export class UsersService {
       email: 'admin@test.com',
       password: '$2b$10$hc6hOxMc0k9ib05yH2lL9.iKXgLHZ1nabXfveRG9YqQYoBZ5vQ6R2',
       name: 'Admin',
+      role: UserRole.ADMIN,
+    },
+    {
+      id: '2',
+      email: 'user@test.com',
+      password: '$2b$10$1ToeQBijyIyKW2LxjbxU/.lGVMnIJ6Yvdu6uxYNvefpknDYICMN0m', // 123
+      name: 'User',
       role: UserRole.USER,
       skills: [],
     },

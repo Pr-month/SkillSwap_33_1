@@ -12,10 +12,9 @@ import {
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { SkillsService } from './skills.service';
-import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
-import { TAuthResponse } from 'src/auth/types';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { TAuthResponse } from '../auth/types';
 
-//TODO: добавить гарды авторизации
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
@@ -33,23 +32,25 @@ export class SkillsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: string) {
     return this.skillsService.findOne(id);
   }
 
   @Patch(':id')
+  @UseGuards(AccessTokenGuard)
   update(
-    @Param('id') id: number,
-    @Req() req: { user: string },
+    @Param('id') id: string,
+    @Req() req: TAuthResponse,
     @Body() updateSkillDto: UpdateSkillDto,
   ) {
-    const ownerId = req.user;
+    const ownerId = req.user.sub;
     return this.skillsService.update(ownerId, id, updateSkillDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number, @Req() req: { user: string }) {
-    const ownerId = req.user;
+  @UseGuards(AccessTokenGuard)
+  remove(@Param('id') id: string, @Req() req: TAuthResponse) {
+    const ownerId = req.user.sub;
     return this.skillsService.remove(ownerId, id);
   }
 }
