@@ -29,8 +29,6 @@ export class SkillsService {
     });
     return this.skillRepository.save(skill);
   }
-
-  // Берём улучшенную версию из week2
   async findAll(query: GetSkillsQueryDto) {
     const { page = 1, limit = 20, search, category } = query;
     const queryBuilder = this.skillRepository
