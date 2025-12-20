@@ -55,7 +55,6 @@ export class SkillsService {
   ): Promise<Skill> {
     const skill = await this.findOne(id);
     if (skill.owner.id !== userId) {
-      // ← теперь skill.owner.id
       throw new ForbiddenException('You can only update your own skills');
     }
     Object.assign(skill, updateSkillDto);
@@ -65,7 +64,6 @@ export class SkillsService {
   async remove(userId: string, id: string): Promise<void> {
     const skill = await this.findOne(id);
     if (skill.owner.id !== userId) {
-      // ← теперь skill.owner.id
       throw new ForbiddenException('You can only delete your own skills');
     }
 
