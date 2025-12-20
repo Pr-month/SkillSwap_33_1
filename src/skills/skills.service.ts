@@ -25,7 +25,7 @@ export class SkillsService {
   ): Promise<Skill> {
     const skill = this.skillRepository.create({
       ...createSkillDto,
-      ownerId,
+      owner: { id: ownerId },
     });
     return this.skillRepository.save(skill);
   }
@@ -34,12 +34,14 @@ export class SkillsService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     query: GetSkillsQueryDto,
   ): Promise<Skill[]> {
-    // TODO: реализовать пагинацию
     return this.skillRepository.find();
   }
 
   async findOne(id: string): Promise<Skill> {
-    const skill = await this.skillRepository.findOneBy({ id });
+    const skill = await this.skillRepository.findOne({
+      where: { id },
+      relations: ['owner'],
+    });
     if (!skill) {
       throw new NotFoundException(`Skill with id ${id} not found`);
     }
@@ -52,7 +54,8 @@ export class SkillsService {
     updateSkillDto: UpdateSkillDto,
   ): Promise<Skill> {
     const skill = await this.findOne(id);
-    if (skill.ownerId !== userId) {
+    if (skill.owner.id !== userId) {
+      // ← теперь skill.owner.id
       throw new ForbiddenException('You can only update your own skills');
     }
     Object.assign(skill, updateSkillDto);
@@ -61,8 +64,8 @@ export class SkillsService {
 
   async remove(userId: string, id: string): Promise<void> {
     const skill = await this.findOne(id);
-
-    if (skill.ownerId !== userId) {
+    if (skill.owner.id !== userId) {
+      // ← теперь skill.owner.id
       throw new ForbiddenException('You can only delete your own skills');
     }
 

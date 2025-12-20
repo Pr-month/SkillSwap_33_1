@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Length, IsEmail, IsOptional, IsDateString } from 'class-validator';
 import { Gender, UserRole } from '../users.enums';
-
+import { Skill } from '../../skills/entities/skill.entity';
 // import { Skill } from 'src/skills/entities/skill.entity';
 // import { Category } from 'src/categories/entities/category.entity';
 
@@ -52,8 +52,8 @@ export class User {
   @IsOptional()
   avatar?: string;
 
-  @OneToMany('Skill', 'owner')
-  skills: import('src/skills/entities/skill.entity').Skill[];
+  @OneToMany(() => Skill, (skill) => skill.owner)
+  skills: Skill[];
 
   @Column({
     type: 'enum',

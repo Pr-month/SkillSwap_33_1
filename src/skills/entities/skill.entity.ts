@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
-@Entity()
+@Entity('skills')
 export class Skill {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -26,11 +26,11 @@ export class Skill {
   @Column({ nullable: true })
   image?: string;
 
-  @ManyToOne(() => User, (user) => user.skills)
+  @ManyToOne(() => User, (user) => user.skills, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'ownerId' })
   owner: User;
-
-  ownerId: string;
 
   @CreateDateColumn()
   createdAt: Date;
