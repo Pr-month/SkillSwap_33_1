@@ -30,17 +30,55 @@ export class SkillsService {
     return this.skillRepository.save(skill);
   }
 
-  async findAll(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    query: GetSkillsQueryDto,
-  ): Promise<Skill[]> {
-    return this.skillRepository.find();
+  // Берём улучшенную версию из week2
+  async findAll(query: GetSkillsQueryDto) {
+    const { page = 1, limit = 20, search, category } = query;
+    const queryBuilder = this.skillRepository
+      .createQueryBuilder('skill')
+      .leftJoinAndSelect('skill.owner', 'owner')
+      .leftJoinAndSelect('skill.category', 'category')
+      .leftJoinAndSelect('category.parent', 'parent');
+
+    if (search) {
+      queryBuilder.andWhere(
+        `(LOWER(skill.title) LIKE :search
+          OR LOWER(category.name) LIKE :search
+          OR LOWER(parent.name) LIKE :search)`,
+        { search: `%${search.toLowerCase()}%` },
+      );
+    }
+
+    if (category) {
+      queryBuilder.andWhere(
+        '(category.id = :category OR parent.id = :category)',
+        { category },
+      );
+    }
+
+    const skip = (page - 1) * limit;
+    const [data, total] = await queryBuilder
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    const totalPages = Math.ceil(total / limit);
+    if (page > totalPages && totalPages > 0) {
+      throw new NotFoundException(
+        `Страница ${page} не найдена. Всего страниц: ${totalPages}`,
+      );
+    }
+
+    return {
+      data,
+      page,
+      totalPages,
+    };
   }
 
   async findOne(id: string): Promise<Skill> {
     const skill = await this.skillRepository.findOne({
       where: { id },
-      relations: ['owner'],
+      relations: ['owner', 'category', 'category.parent'],
     });
     if (!skill) {
       throw new NotFoundException(`Skill with id ${id} not found`);
@@ -67,13 +105,15 @@ export class SkillsService {
       throw new ForbiddenException('You can only delete your own skills');
     }
 
-    if (skill.image) {
-      const imagePath = path.join(process.cwd(), skill.image);
-      try {
-        await fs.access(imagePath);
-        await fs.unlink(imagePath);
-      } catch {
-        // Игнорируем ошибку удаления файла
+    if (skill.images?.length) {
+      for (const image of skill.images) {
+        const imagePath = path.join(process.cwd(), image);
+        try {
+          await fs.access(imagePath);
+          await fs.unlink(imagePath);
+        } catch {
+          // Игнорируем ошибку удаления файла
+        }
       }
     }
 
