@@ -26,7 +26,7 @@ export class UsersService {
     },
   ];
 
-  create(createUserDto: CreateUserDto): User {
+  create(createUserDto: CreateUserDto): Promise<User> {
     // const newUser = {
     //   id: this.users.length + 1,
     //   ...createUserDto,
@@ -36,7 +36,7 @@ export class UsersService {
 
     //TODO перевести на работу с БД
     console.log(`createUserDto ${JSON.stringify(createUserDto)}`);
-    return this.users[0];
+    return new Promise<User>((resolve) => resolve(this.users[0]));
   }
 
   findAll(): User[] {
@@ -66,8 +66,10 @@ export class UsersService {
     return newRefreshToken;
   }
 
-  findByEmail(email: string): User | undefined {
-    return this.users.find((user) => user.email === email);
+  findByEmail(email: string): Promise<User | undefined> {
+    return new Promise((resolve) =>
+      resolve(this.users.find((user) => user.email === email)),
+    );
   }
   // TODO: Реализовать когда будет подключена БД
   updatePassword(userId: number, _updatePasswordDto: UpdatePasswordDto) {

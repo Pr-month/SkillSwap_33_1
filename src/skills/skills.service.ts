@@ -1,7 +1,7 @@
 import {
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -9,30 +9,34 @@ import { Skill } from './entities/skill.entity';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { GetSkillsQueryDto } from './dto/get-skills-query.dto';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 @Injectable()
 export class SkillsService {
   constructor(
     @InjectRepository(Skill)
-    private readonly skillRepository: Repository<Skill>,
+    private skillRepository: Repository<Skill>,
   ) {}
 
-  async create(ownerId: string, createSkillDto: CreateSkillDto) {
-    const createdSkill = await this.skillRepository.save({
+  async create(
+    ownerId: string,
+    createSkillDto: CreateSkillDto,
+  ): Promise<Skill> {
+    return this.skillRepository.save({
       title: createSkillDto.title,
       description: createSkillDto.description,
-      category: { id: createSkillDto.category },
-      images: createSkillDto.images,
+      images: createSkillDto.images || [],
       owner: { id: ownerId },
+      category: { id: createSkillDto.category },
     });
-
-    return createdSkill;
   }
 
   async findAll(query: GetSkillsQueryDto) {
     const { page = 1, limit = 20, search, category } = query;
     const queryBuilder = this.skillRepository
       .createQueryBuilder('skill')
+      .leftJoinAndSelect('skill.owner', 'owner')
       .leftJoinAndSelect('skill.category', 'category')
       .leftJoinAndSelect('category.parent', 'parent');
 
@@ -59,7 +63,6 @@ export class SkillsService {
       .getManyAndCount();
 
     const totalPages = Math.ceil(total / limit);
-
     if (page > totalPages && totalPages > 0) {
       throw new NotFoundException(
         `Страница ${page} не найдена. Всего страниц: ${totalPages}`,
@@ -73,32 +76,48 @@ export class SkillsService {
     };
   }
 
-  //TODO реализовать метод
-  async findOne(id: string) {
-    console.log(`This action returns a #${id} skill`);
-    return await this.skillRepository.findOne({});
-  }
-
-  async update(ownerId: string, id: string, updateSkillDto: UpdateSkillDto) {
+  async findOne(id: string): Promise<Skill> {
     const skill = await this.skillRepository.findOne({
       where: { id },
-      relations: ['owner'],
+      relations: ['owner', 'category', 'category.parent'],
     });
-
     if (!skill) {
-      throw new NotFoundException(`Навык с ID ${id} не найден`);
+      throw new NotFoundException(`Skill with id ${id} not found`);
     }
+    return skill;
+  }
 
-    if (skill.owner?.id !== ownerId) {
-      throw new ForbiddenException('Вы можете обновлять только свои навыки');
+  async update(
+    userId: string,
+    id: string,
+    updateSkillDto: UpdateSkillDto,
+  ): Promise<Skill> {
+    const skill = await this.findOne(id);
+    if (skill.owner.id !== userId) {
+      throw new ForbiddenException('You can only update your own skills');
     }
-
     Object.assign(skill, updateSkillDto);
     return this.skillRepository.save(skill);
   }
-  //TODO добавить необходимые параметры
-  async remove(ownerId: string, id: string) {
-    console.log(`${ownerId} ${id}`);
-    return await this.skillRepository.remove([]);
+
+  async remove(userId: string, id: string): Promise<void> {
+    const skill = await this.findOne(id);
+    if (skill.owner.id !== userId) {
+      throw new ForbiddenException('You can only delete your own skills');
+    }
+
+    if (skill.images?.length) {
+      for (const image of skill.images) {
+        const imagePath = path.join(process.cwd(), image);
+        try {
+          await fs.access(imagePath);
+          await fs.unlink(imagePath);
+        } catch {
+          // Файл уже удалён или не существует — игнорируем
+        }
+      }
+    }
+
+    await this.skillRepository.delete(id);
   }
 }

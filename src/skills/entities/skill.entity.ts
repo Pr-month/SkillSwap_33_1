@@ -2,10 +2,11 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  CreateDateColumn,
+  UpdateDateColumn,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-
 import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
 
@@ -14,11 +15,11 @@ export class Skill {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column()
   title: string;
 
-  @Column({ type: 'text' })
-  description: string;
+  @Column({ nullable: true })
+  description?: string;
 
   @ManyToOne(() => Category, { eager: true })
   @JoinColumn({ name: 'categoryId' })
@@ -27,7 +28,15 @@ export class Skill {
   @Column('text', { array: true, default: [] })
   images: string[];
 
-  //Пользователь создавший навык
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.skills, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'ownerId' })
   owner: User;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

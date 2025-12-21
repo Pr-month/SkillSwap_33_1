@@ -1,11 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { jwtConfig as jwtCnf } from '../config/jwt.config';
 import { JwtConfig } from '../config/types';
-import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
+import { LoginDto } from './dto/login.dto';
 import { TJwtPayload } from './types';
 
 @Injectable()
@@ -36,38 +36,40 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  login(user: Omit<User, 'password'>) {
-    const payload = { email: user.email, sub: user.id, role: user.role };
+  async login(loginData: LoginDto) {
+    const user = await this.validateUser(loginData.email, loginData.password);
+    const { accessToken, refreshToken } = await this.refresh({
+      sub: user.sub,
+      role: user.role,
+      email: user.email,
+    });
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
+      refresh_token: refreshToken,
     };
   }
 
-  async validateUser(
-    email: string,
-    password: string,
-  ): Promise<Omit<User, 'password'> | null> {
-    const user = this.usersService.findByEmail(email);
+  async validateUser(email: string, password: string): Promise<TJwtPayload> {
+    const user = await this.usersService.findByEmail(email);
     if (!user) {
-      return null;
+      throw new UnauthorizedException('Invalid email or password');
     }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (isPasswordValid) {
-      return {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        skills: user.skills,
-      };
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
     }
-    return null;
+
+    return {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
   }
 
   async register(dto: CreateAuthDto) {
     const hash = await bcrypt.hash(dto.password, 10);
-    //TODO добавить await после перехода на БД
-    const user = this.usersService.create({
+    const user = await this.usersService.create({
       ...dto,
       password: hash,
     });

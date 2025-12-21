@@ -6,15 +6,8 @@ import {
   Post,
   Request,
   Res,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { Response } from 'express';
-import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { LoginDto } from './dto/login.dto';
-import { RefreshTokenGuard } from './guards/refreshToken.guard';
-import { TJwtPayload } from './types';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -22,6 +15,12 @@ import {
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
+import { Response } from 'express';
+import { AuthService } from './auth.service';
+import { CreateAuthDto } from './dto/create-auth.dto';
+import { LoginDto } from './dto/login.dto';
+import { RefreshTokenGuard } from './guards/refreshToken.guard';
+import { TAuthResponse } from './types';
 
 @Controller('auth')
 export class AuthController {
@@ -45,7 +44,7 @@ export class AuthController {
     status: 401,
     description: 'Неверный или просроченный refresh токен',
   })
-  refresh(@Request() req: Request & { user: TJwtPayload }) {
+  refresh(@Request() req: TAuthResponse) {
     const { user } = req;
     return this.authService.refresh(user);
   }
@@ -60,15 +59,9 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Неверные учетные данные' })
   async login(@Body() loginDto: LoginDto) {
-    const user = await this.authService.validateUser(
-      loginDto.email,
-      loginDto.password,
-    );
-    if (!user) {
-      throw new UnauthorizedException('Неверные учетные данные');
-    }
-    return this.authService.login(user);
+    return await this.authService.login(loginDto);
   }
+
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Регистрация нового пользователя' })
