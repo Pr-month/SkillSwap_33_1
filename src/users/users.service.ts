@@ -15,8 +15,18 @@ export class UsersService {
   ) {}
 
   private filterUser(user: User): UserResponseDto {
-    const { password, refreshToken, ...userWithoutSensitiveData } = user;
-    return userWithoutSensitiveData;
+    const userResponse = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      about: user.about,
+      birthdate: user.birthdate,
+      city: user.city,
+      gender: user.gender,
+      avatar: user.avatar,
+      role: user.role,
+    };
+    return userResponse;
   }
 
   private async findUserById(userId: string): Promise<User> {

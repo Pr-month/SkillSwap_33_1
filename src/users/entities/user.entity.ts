@@ -6,7 +6,6 @@ import {
   //   JoinTable,
   //   ManyToMany,
 } from 'typeorm';
-import { Length, IsEmail, IsOptional, IsDateString } from 'class-validator';
 import { Gender } from '../users.enums';
 import { Skill } from '../../skills/entities/skill.entity';
 import { UserRole } from '../../auth/roles.enum';
