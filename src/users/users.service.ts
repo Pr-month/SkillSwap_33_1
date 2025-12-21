@@ -98,8 +98,8 @@ export class UsersService {
   }
 
   // TODO: Реализовать когда будет подключена БД
-  updatePassword(userId: number, _updatePasswordDto: UpdatePasswordDto) {
+  updatePassword(userId: string, _updatePasswordDto: UpdatePasswordDto) {
     void _updatePasswordDto; // Заглушка
-    return `This action updates password for user #${userId}`;
+    return `This action updates password for the current user ${userId}`;
   }
 }

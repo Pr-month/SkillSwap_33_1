@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class UpdatePasswordDto {
   @ApiProperty({
@@ -7,8 +7,9 @@ export class UpdatePasswordDto {
     description: 'Текущий пароль пользователя',
     minLength: 6,
   })
-  @IsString()
-  @MinLength(6)
+  @IsString({ message: 'Пароль должен быть строкой' })
+  @IsNotEmpty({ message: 'Текущий пароль обязателен' })
+  @MinLength(6, { message: 'Минимальная длина пароля 6 символов' })
   oldPassword: string;
 
   @ApiProperty({
@@ -16,7 +17,8 @@ export class UpdatePasswordDto {
     description: 'Новый пароль пользователя',
     minLength: 6,
   })
-  @IsString()
-  @MinLength(6)
+  @IsString({ message: 'Пароль должен быть строкой' })
+  @IsNotEmpty({ message: 'Новый пароль обязателен' })
+  @MinLength(6, { message: 'Минимальная длина пароля 6 символов' })
   newPassword: string;
 }

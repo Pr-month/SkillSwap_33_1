@@ -14,37 +14,66 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../auth/roles.enum';
 import { TAuthResponse } from 'src/auth/types';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 
-//TODO: Нужны ли роли и валидации?
+@ApiTags('users')
 @Controller('users')
+@ApiBearerAuth()
+@UseGuards(AccessTokenGuard, RolesGuard)
+@Roles(UserRole.ADMIN)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // Добавляем GET /users/me
-  @UseGuards(AccessTokenGuard)
+  @Roles(UserRole.USER, UserRole.ADMIN)
   @Get('me')
   @ApiOperation({ summary: 'Получить данные текущего пользователя' })
   @ApiResponse({ status: 200, description: 'Текущий пользователь' })
+  @ApiResponse({ status: 401, description: 'Неавторизован' })
   getMe(@Req() req: TAuthResponse) {
     const userId = req.user.sub;
     return this.usersService.findOne(userId);
   }
 
-  // Добавляем PATCH /users/me
-  @UseGuards(AccessTokenGuard)
+  @Roles(UserRole.USER, UserRole.ADMIN)
   @Patch('me')
   @ApiOperation({ summary: 'Обновить данные текущего пользователя' })
   @ApiBody({ type: UpdateUserDto })
   @ApiResponse({ status: 200, description: 'Данные пользователя обновлены' })
+  @ApiResponse({ status: 400, description: 'Некорректные данные' })
+  @ApiResponse({ status: 401, description: 'Неавторизован' })
   updateMe(@Req() req: TAuthResponse, @Body() updateUserDto: UpdateUserDto) {
     const userId = req.user.sub;
-    if (!updateUserDto) throw new BadRequestException('Update data undefined');
-    console.log(userId);
-    console.log(updateUserDto);
+    if (!updateUserDto || Object.keys(updateUserDto).length === 0) {
+      throw new BadRequestException('Update data is required');
+    }
     return this.usersService.update(userId, updateUserDto);
+  }
+
+  @Roles(UserRole.USER, UserRole.ADMIN)
+  @Patch('me/password')
+  @ApiOperation({ summary: 'Сменить пароль текущего пользователя' })
+  @ApiBody({ type: UpdatePasswordDto })
+  @ApiResponse({ status: 200, description: 'Пароль успешно изменён' })
+  @ApiResponse({ status: 400, description: 'Некорректные данные' })
+  @ApiResponse({ status: 401, description: 'Неавторизован' })
+  updatePassword(
+    @Req() req: TAuthResponse,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ) {
+    const userId = req.user.sub;
+    return this.usersService.updatePassword(userId, updatePasswordDto);
   }
 
   @Post()
@@ -53,6 +82,9 @@ export class UsersController {
   })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({ status: 201, description: 'Пользователь создан' })
+  @ApiResponse({ status: 400, description: 'Некорректные данные' })
+  @ApiResponse({ status: 401, description: 'Неавторизован' })
+  @ApiResponse({ status: 403, description: 'Доступ запрещён (не админ)' })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
@@ -60,6 +92,8 @@ export class UsersController {
   @Get()
   @ApiOperation({ summary: 'Получить список пользователей' })
   @ApiResponse({ status: 200, description: 'Список пользователей' })
+  @ApiResponse({ status: 401, description: 'Неавторизован' })
+  @ApiResponse({ status: 403, description: 'Доступ запрещён (не админ)' })
   findAll() {
     return this.usersService.findAll();
   }
@@ -74,24 +108,10 @@ export class UsersController {
   })
   @ApiResponse({ status: 200, description: 'Пользователь найден' })
   @ApiResponse({ status: 404, description: 'Пользователь не найден' })
+  @ApiResponse({ status: 401, description: 'Неавторизован' })
+  @ApiResponse({ status: 403, description: 'Доступ запрещён (не админ)' })
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
-  }
-
-  //TODO: Реализовать обновление пароля
-  @UseGuards(AccessTokenGuard)
-  @Patch('me/password')
-  @ApiOperation({ summary: 'Сменить пароль текущего пользователя' })
-  @ApiBody({ type: UpdatePasswordDto })
-  @ApiResponse({ status: 200, description: 'Пароль успешно изменён' })
-  @ApiResponse({ status: 400, description: 'Некорректные данные' })
-  @ApiResponse({ status: 401, description: 'Неавторизован' })
-  updatePassword(
-    @Req() req: { user: { sub: number } },
-    @Body() updatePasswordDto: UpdatePasswordDto,
-  ) {
-    const userId = req.user.sub;
-    return this.usersService.updatePassword(userId, updatePasswordDto);
   }
 
   @Patch(':id')
@@ -105,6 +125,8 @@ export class UsersController {
   @ApiBody({ type: UpdateUserDto })
   @ApiResponse({ status: 200, description: 'Пользователь обновлён' })
   @ApiResponse({ status: 404, description: 'Пользователь не найден' })
+  @ApiResponse({ status: 401, description: 'Неавторизован' })
+  @ApiResponse({ status: 403, description: 'Доступ запрещён (не админ)' })
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
@@ -119,6 +141,8 @@ export class UsersController {
   })
   @ApiResponse({ status: 200, description: 'Пользователь удалён' })
   @ApiResponse({ status: 404, description: 'Пользователь не найден' })
+  @ApiResponse({ status: 401, description: 'Неавторизован' })
+  @ApiResponse({ status: 403, description: 'Доступ запрещён (не админ)' })
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
