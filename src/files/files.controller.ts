@@ -8,10 +8,47 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuid } from 'uuid';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('Files')
 @Controller('files')
 export class FilesController {
   @Post('upload')
+  @ApiOperation({ summary: 'Загрузить изображение' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Файл изображения (jpeg, png, gif, webp) до 2 МБ',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['file'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Файл успешно загружен, возвращается URL',
+    schema: {
+      type: 'object',
+      properties: {
+        url: {
+          type: 'string',
+          example: '/uploads/drums-1.png',
+          description: 'Путь к загруженному файлу',
+        },
+      },
+    },
+  })
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -22,7 +59,7 @@ export class FilesController {
         },
       }),
       limits: {
-        fileSize: 2 * 1024 * 1024,
+        fileSize: 2 * 1024 * 1024, // 2 МБ
       },
       fileFilter: (req, file, callback) => {
         if (!file.mimetype.match(/^image\/(jpeg|png|gif|webp)$/)) {

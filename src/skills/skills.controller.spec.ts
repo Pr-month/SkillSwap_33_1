@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SkillsController } from './skills.controller';
-import { SkillsService } from './skills.service';
+import { UserRole } from '../auth/roles.enum';
+import { TAuthResponse } from '../auth/types';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
-import { TAuthResponse } from '../auth/types';
-import { UserRole } from '../auth/roles.enum';
+import { SkillsController } from './skills.controller';
+import { SkillsService } from './skills.service';
 
 describe('SkillsController', () => {
   let controller: SkillsController;
