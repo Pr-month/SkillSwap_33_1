@@ -6,7 +6,6 @@ import {
   Post,
   Request,
   Res,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -14,6 +13,7 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
+import { TAuthResponse } from './types';
 
 @Controller('auth')
 export class AuthController {
@@ -21,20 +21,13 @@ export class AuthController {
 
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
-  refresh(@Request() req: Request & { user: { sub: string } }) {
+  refresh(@Request() req: TAuthResponse) {
     const { user } = req;
     return this.authService.refresh(user);
   }
   @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    const user = await this.authService.validateUser(
-      loginDto.email,
-      loginDto.password,
-    );
-    if (!user) {
-      throw new UnauthorizedException('Неверные учетные данные');
-    }
-    return this.authService.login(user);
+  login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
   }
   @Post('register')
   @HttpCode(HttpStatus.CREATED)

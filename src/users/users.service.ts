@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UserResponseDto } from './dto/get-user-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -12,43 +14,51 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  private filterUser(user: User): Partial<User> {
+  private filterUser(user: User): UserResponseDto {
     const { password, refreshToken, ...userWithoutSensitiveData } = user;
     return userWithoutSensitiveData;
   }
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  private async findUserById(userId: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({
+      id: userId,
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Пользователь с ID ${userId} не существует`);
+    }
+    return user;
   }
 
-  async findAll(): Promise<User[]> {
+  create(createUserDto: CreateUserDto): UserResponseDto {
+    const user = this.usersRepository.create(createUserDto);
+    return this.filterUser(user);
+  }
+
+  async findAll(): Promise<UserResponseDto[]> {
     const users = await this.usersRepository.find();
     return users.map((user) => this.filterUser(user));
   }
 
-  async findOne(id: string): Promise<User> {
-    const user = await this.usersRepository.findOne({
-      where: { id },
-    });
-
-    if (!user) {
-      throw new NotFoundException(`Пользователь с ID ${id} не существует`);
-    }
-
+  async findOne(id: string): Promise<UserResponseDto> {
+    const user = await this.findUserById(id);
     return this.filterUser(user);
   }
 
-  update(id: string, updateUserDto: UpdateUserDto): User | undefined {
-    const user = this.findOne(id);
-    if (!user) return undefined;
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const user = await this.findUserById(id);
     Object.assign(user, updateUserDto);
-    return user;
+    return this.filterUser(user);
   }
 
-  remove(id: string): boolean {
-    const index = this.users.findIndex((user) => user.id === id);
-    if (index === -1) return false;
-    this.users.splice(index, 1);
+  async remove(id: string): Promise<boolean> {
+    const result = await this.usersRepository.delete(id);
+    if (!result.affected) {
+      throw new NotFoundException(`Пользователь с ID ${id} не существует`);
+    }
     return true;
   }
 
@@ -57,9 +67,18 @@ export class UsersService {
     return newRefreshToken;
   }
 
-  findByEmail(email: string): User | undefined {
-    return this.users.find((user) => user.email === email);
+  async findByEmail(email: string): Promise<UserResponseDto> {
+    const user = await this.usersRepository.findOneBy({
+      email: email,
+    });
+    if (!user) {
+      throw new NotFoundException(
+        `Пользователь с email ${email} не существует`,
+      );
+    }
+    return this.filterUser(user);
   }
+
   // TODO: Реализовать когда будет подключена БД
   updatePassword(userId: number, _updatePasswordDto: UpdatePasswordDto) {
     void _updatePasswordDto; // Заглушка
