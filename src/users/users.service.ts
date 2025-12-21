@@ -1,63 +1,82 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { UserRole } from '../auth/roles.enum';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UserResponseDto } from './dto/get-user-response.dto';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [
-    {
-      id: '1',
-      email: 'admin@test.com',
-      password: '$2b$10$hc6hOxMc0k9ib05yH2lL9.iKXgLHZ1nabXfveRG9YqQYoBZ5vQ6R2',
-      name: 'Admin',
-      role: UserRole.ADMIN,
-      skills: [],
-    },
-    {
-      id: '2',
-      email: 'user@test.com',
-      password: '$2b$10$1ToeQBijyIyKW2LxjbxU/.lGVMnIJ6Yvdu6uxYNvefpknDYICMN0m', // 123
-      name: 'User',
-      role: UserRole.USER,
-      skills: [],
-    },
-  ];
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
-  create(createUserDto: CreateUserDto): Promise<User> {
-    // const newUser = {
-    //   id: this.users.length + 1,
-    //   ...createUserDto,
-    //   password: '$2b$10$hc6hOxMc0k9ib05yH2lL9.iKXgLHZ1nabXfveRG9YqQYoBZ5vQ6R2',
-    // } as User;
-    // this.users.push(newUser);
-
-    //TODO перевести на работу с БД
-    console.log(`createUserDto ${JSON.stringify(createUserDto)}`);
-    return new Promise<User>((resolve) => resolve(this.users[0]));
+  private filterUser(user: User): UserResponseDto {
+    const userResponse = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      about: user.about,
+      birthdate: user.birthdate,
+      city: user.city,
+      gender: user.gender,
+      avatar: user.avatar,
+      role: user.role,
+    };
+    return userResponse;
   }
 
-  findAll(): User[] {
-    return this.users;
-  }
+  private async findUserById(userId: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({
+      id: userId,
+    });
 
-  findOne(id: string): User | undefined {
-    return this.users.find((user) => user.id === id);
-  }
-
-  update(id: string, updateUserDto: UpdateUserDto): User | undefined {
-    const user = this.findOne(id);
-    if (!user) return undefined;
-    Object.assign(user, updateUserDto);
+    if (!user) {
+      throw new NotFoundException(`Пользователь с ID ${userId} не существует`);
+    }
     return user;
   }
 
-  remove(id: string): boolean {
-    const index = this.users.findIndex((user) => user.id === id);
-    if (index === -1) return false;
-    this.users.splice(index, 1);
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+    const user = this.usersRepository.create(createUserDto);
+    const saved = await this.usersRepository.save(user);
+    return this.filterUser(saved);
+  }
+
+  async findAll(): Promise<UserResponseDto[]> {
+    const users = await this.usersRepository.find();
+    return users.map((user) => this.filterUser(user));
+  }
+
+  async findOne(id: string): Promise<UserResponseDto> {
+    const user = await this.findUserById(id);
+    return this.filterUser(user);
+  }
+
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const user = await this.findUserById(id);
+    console.log('UPDATE:', updateUserDto);
+
+    // забираем только ключи, реально пришедшие в запросе (не undefined)
+    const patch = Object.fromEntries(
+      Object.entries(updateUserDto).filter(([, v]) => v !== undefined),
+    );
+
+    const saved = await this.usersRepository.save({ ...user, ...patch });
+    return this.filterUser(saved);
+  }
+
+  async remove(id: string): Promise<boolean> {
+    const result = await this.usersRepository.delete(id);
+    if (!result.affected) {
+      throw new NotFoundException(`Пользователь с ID ${id} не существует`);
+    }
     return true;
   }
 
@@ -66,11 +85,18 @@ export class UsersService {
     return newRefreshToken;
   }
 
-  findByEmail(email: string): Promise<User | undefined> {
-    return new Promise((resolve) =>
-      resolve(this.users.find((user) => user.email === email)),
-    );
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({
+      email: email,
+    });
+    if (!user) {
+      throw new NotFoundException(
+        `Пользователь с email ${email} не существует`,
+      );
+    }
+    return user;
   }
+
   // TODO: Реализовать когда будет подключена БД
   updatePassword(userId: number, _updatePasswordDto: UpdatePasswordDto) {
     void _updatePasswordDto; // Заглушка

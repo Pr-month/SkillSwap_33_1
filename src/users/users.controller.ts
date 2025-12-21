@@ -1,22 +1,24 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
   Delete,
   UseGuards,
   Req,
+  BadRequestException,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { TAuthResponse } from 'src/auth/types';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { CreateUserDto } from './dto/create-user.dto';
 
+//TODO: Нужны ли роли и валидации?
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -39,6 +41,9 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Данные пользователя обновлены' })
   updateMe(@Req() req: TAuthResponse, @Body() updateUserDto: UpdateUserDto) {
     const userId = req.user.sub;
+    if (!updateUserDto) throw new BadRequestException('Update data undefined');
+    console.log(userId);
+    console.log(updateUserDto);
     return this.usersService.update(userId, updateUserDto);
   }
 
@@ -73,6 +78,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  //TODO: Реализовать обновление пароля
   @UseGuards(AccessTokenGuard)
   @Patch('me/password')
   @ApiOperation({ summary: 'Сменить пароль текущего пользователя' })

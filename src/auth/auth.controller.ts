@@ -17,14 +17,14 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { TAuthResponse } from './types';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
@@ -64,6 +64,7 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
+<<<<<<< HEAD
   @ApiOperation({ summary: 'Регистрация нового пользователя' })
   @ApiBody({ type: CreateAuthDto })
   @ApiResponse({
@@ -73,6 +74,10 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Некорректные данные регистрации' })
   register(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.register(createAuthDto);
+=======
+  register(@Body() createUserDto: CreateUserDto) {
+    return this.authService.register(createUserDto);
+>>>>>>> week2
   }
 
   @Post('logout')
