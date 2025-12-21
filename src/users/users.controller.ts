@@ -1,21 +1,21 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
   Delete,
   UseGuards,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { TAuthResponse } from 'src/auth/types';
 
+//TODO: Нужны ли роли и валидации?
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -33,12 +33,10 @@ export class UsersController {
   @Patch('me')
   updateMe(@Req() req: TAuthResponse, @Body() updateUserDto: UpdateUserDto) {
     const userId = req.user.sub;
+    if (!updateUserDto) throw new BadRequestException('Update data undefined');
+    console.log(userId);
+    console.log(updateUserDto);
     return this.usersService.update(userId, updateUserDto);
-  }
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
   }
 
   @Get()
@@ -51,6 +49,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  //TODO: Реализовать обновление пароля
   @UseGuards(AccessTokenGuard)
   @Patch('me/password')
   updatePassword(

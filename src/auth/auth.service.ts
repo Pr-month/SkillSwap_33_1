@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { jwtConfig as jwtCnf } from '../config/jwt.config';
 import { JwtConfig } from '../config/types';
 import { UsersService } from '../users/users.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { TJwtPayload } from './types';
 
@@ -67,12 +67,12 @@ export class AuthService {
     };
   }
 
-  async register(dto: CreateAuthDto) {
+  async register(dto: CreateUserDto) {
     const hash = await bcrypt.hash(dto.password, 10);
-    const user = await this.usersService.create({
+    await this.usersService.create({
       ...dto,
       password: hash,
     });
-    return this.login(user);
+    return this.login(dto);
   }
 }

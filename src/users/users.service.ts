@@ -40,9 +40,10 @@ export class UsersService {
     return user;
   }
 
-  create(createUserDto: CreateUserDto): UserResponseDto {
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const user = this.usersRepository.create(createUserDto);
-    return this.filterUser(user);
+    const saved = await this.usersRepository.save(user);
+    return this.filterUser(saved);
   }
 
   async findAll(): Promise<UserResponseDto[]> {
@@ -60,8 +61,15 @@ export class UsersService {
     updateUserDto: UpdateUserDto,
   ): Promise<UserResponseDto> {
     const user = await this.findUserById(id);
-    Object.assign(user, updateUserDto);
-    return this.filterUser(user);
+    console.log('UPDATE:', updateUserDto);
+
+    // забираем только ключи, реально пришедшие в запросе (не undefined)
+    const patch = Object.fromEntries(
+      Object.entries(updateUserDto).filter(([, v]) => v !== undefined),
+    );
+
+    const saved = await this.usersRepository.save({ ...user, ...patch });
+    return this.filterUser(saved);
   }
 
   async remove(id: string): Promise<boolean> {
@@ -77,7 +85,7 @@ export class UsersService {
     return newRefreshToken;
   }
 
-  async findByEmail(email: string): Promise<UserResponseDto> {
+  async findByEmail(email: string): Promise<User> {
     const user = await this.usersRepository.findOneBy({
       email: email,
     });
@@ -86,7 +94,7 @@ export class UsersService {
         `Пользователь с email ${email} не существует`,
       );
     }
-    return this.filterUser(user);
+    return user;
   }
 
   // TODO: Реализовать когда будет подключена БД
