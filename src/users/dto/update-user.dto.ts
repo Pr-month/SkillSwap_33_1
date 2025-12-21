@@ -1,12 +1,10 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateUserDto } from './create-user.dto';
 import {
-  Length,
-  IsOptional,
   IsDateString,
+  IsEnum,
+  IsOptional,
   IsString,
   IsUrl,
-  IsEnum,
+  Length,
 } from 'class-validator';
 import { Gender } from '../users.enums';
 
