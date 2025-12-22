@@ -21,6 +21,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { TAuthResponse } from './types';
+import { AccessTokenGuard } from './guards/accessToken.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -77,9 +78,14 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AccessTokenGuard) // Добавляем гард
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Выход пользователя (logout)' })
   @ApiResponse({ status: 200, description: 'Пользователь разлогинен' })
-  logout(@Res() res: Response) {
-    return res.status(200).json({});
+  @ApiResponse({ status: 401, description: 'Неавторизован' })
+  async logout(@Request() req: TAuthResponse, @Res() res: Response) {
+    return res.status(200).json({ 
+      message: 'Успешный выход из системы' 
+    });
   }
 }
