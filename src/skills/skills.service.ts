@@ -100,7 +100,7 @@ export class SkillsService {
     return this.skillRepository.save(skill);
   }
 
-  async remove(userId: string, id: string): Promise<void> {
+  async remove(userId: string, id: string): Promise<{ message: string }> {
     const skill = await this.findOne(id);
     if (skill.owner.id !== userId) {
       throw new ForbiddenException('You can only delete your own skills');
@@ -119,5 +119,6 @@ export class SkillsService {
     }
 
     await this.skillRepository.delete(id);
+    return { message: 'Навык успешно удалён' };
   }
 }
