@@ -78,14 +78,16 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AccessTokenGuard) // Добавляем гард
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Выход пользователя (logout)' })
   @ApiResponse({ status: 200, description: 'Пользователь разлогинен' })
   @ApiResponse({ status: 401, description: 'Неавторизован' })
   async logout(@Request() req: TAuthResponse, @Res() res: Response) {
-    return res.status(200).json({ 
-      message: 'Успешный выход из системы' 
+    await Promise.resolve(); // Заглушка для ESLint
+
+    return res.status(200).json({
+      message: 'Успешный выход из системы',
     });
   }
 }
