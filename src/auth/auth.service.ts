@@ -47,10 +47,7 @@ export class AuthService {
       role: user.role,
       email: user.email,
     });
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    };
+    return { accessToken, refreshToken };
   }
 
   async validateUser(email: string, password: string): Promise<TJwtPayload> {
