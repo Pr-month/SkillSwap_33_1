@@ -31,7 +31,11 @@ export class AuthService {
   }
 
   async refresh(user: TJwtPayload) {
-    const { accessToken, refreshToken } = this.generateTokens(user);
+    const { accessToken, refreshToken } = this.generateTokens({
+      sub: user.sub,
+      email: user.email,
+      role: user.role,
+    });
     await this.usersService.refresh(user.sub, refreshToken);
     return { accessToken, refreshToken };
   }
@@ -43,10 +47,7 @@ export class AuthService {
       role: user.role,
       email: user.email,
     });
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    };
+    return { accessToken, refreshToken };
   }
 
   async validateUser(email: string, password: string): Promise<TJwtPayload> {
