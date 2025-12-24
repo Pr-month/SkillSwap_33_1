@@ -1,5 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -61,7 +66,6 @@ export class UsersService {
     updateUserDto: UpdateUserDto,
   ): Promise<UserResponseDto> {
     const user = await this.findUserById(id);
-    console.log('UPDATE:', updateUserDto);
 
     // забираем только ключи, реально пришедшие в запросе (не undefined)
     const patch = Object.fromEntries(
@@ -81,8 +85,12 @@ export class UsersService {
   }
 
   async refresh(userId: string, newRefreshToken: string) {
-    await new Promise((r) => setTimeout(r, 500));
-    return newRefreshToken;
+    await this.usersRepository.update(userId, {
+      refreshToken: newRefreshToken,
+    });
+    
+    const updatedUser = await this.findUserById(userId);
+    return updatedUser.refreshToken;
   }
 
   async findByEmail(email: string): Promise<User> {
@@ -97,9 +105,41 @@ export class UsersService {
     return user;
   }
 
-  // TODO: Реализовать когда будет подключена БД
-  updatePassword(userId: string, _updatePasswordDto: UpdatePasswordDto) {
-    void _updatePasswordDto; // Заглушка
-    return `This action updates password for the current user ${userId}`;
+  async updatePassword(
+    userId: string,
+    updatePasswordDto: UpdatePasswordDto,
+  ): Promise<{ message: string }> {
+    const user = await this.findUserById(userId);
+    
+    const isOldPasswordValid = await bcrypt.compare(
+      updatePasswordDto.oldPassword,
+      user.password,
+    );
+    
+    if (!isOldPasswordValid) {
+      throw new BadRequestException('Неверный текущий пароль');
+    }
+    
+    const isSamePassword = await bcrypt.compare(
+      updatePasswordDto.newPassword,
+      user.password,
+    );
+    
+    if (isSamePassword) {
+      throw new BadRequestException(
+        'Новый пароль должен отличаться от текущего',
+      );
+    }
+    
+    const hashedPassword = await bcrypt.hash(updatePasswordDto.newPassword, 10);
+    
+    await this.usersRepository.update(userId, {
+      password: hashedPassword,
+      refreshToken: null,
+    });
+    
+    return {
+      message: 'Пароль успешно изменён',
+    };
   }
 }
