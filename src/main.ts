@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { join } from 'path';
 
 import { AppModule } from './app.module';
@@ -11,9 +13,27 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
   const appConfig = configService.get<AppConfig>('APP_CONFIG');
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // удаляет поля без валидаторов
+      forbidNonWhitelisted: true, // бросает 400, если прислали лишнее
+      transform: true, // преобразует типы по DTO
+    }),
+  );
+
   app.useGlobalFilters(new AllExceptionFilter());
   app.useStaticAssets(join(__dirname, '..', 'public'));
+  const config = new DocumentBuilder()
+    .setTitle('SkillSwap API')
+    .setDescription('API для проекта SkillSwap')
+    .setVersion('1.0')
+    .build();
 
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api', app, document, {
+    jsonDocumentUrl: 'api-json',
+  });
   await app.listen(appConfig?.port ?? 3000);
 }
 

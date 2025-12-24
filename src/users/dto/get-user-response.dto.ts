@@ -1,43 +1,50 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDateString,
+  IsEmail,
   IsEnum,
   IsOptional,
   IsString,
   IsUrl,
-  Length,
+  IsUUID,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
 import { Gender } from '../users.enums';
+import { UserRole } from '../../auth/roles.enum';
 
-export class UpdateUserDto {
+export class UserResponseDto {
+  @ApiProperty({
+    example: '11111111-2222-3333-4444-555555555555',
+    description: 'ID пользователя',
+  })
+  @IsUUID()
+  id: string;
+
   @ApiProperty({
     example: 'Иван Иванов',
-    description: 'Имя пользователя (2–50 символов)',
-    minLength: 2,
-    maxLength: 50,
-    required: false,
+    description: 'Имя пользователя',
   })
-  @IsOptional()
   @IsString()
-  @Length(2, 50, { message: 'Ваше имя должно быть от 2 до 50 символов' })
-  name?: string;
+  name: string;
+
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'Email пользователя',
+  })
+  @IsEmail({}, { message: 'Некорректный email' })
+  email: string;
 
   @ApiProperty({
     example: 'Backend-разработчик из Москвы',
-    description: 'Информация о пользователе (до 1000 символов)',
-    maxLength: 1000,
+    description: 'Информация о пользователе',
     required: false,
   })
   @IsOptional()
   @IsString()
-  @Length(0, 1000, {
-    message: 'Информация о себе не должна превышать 1000 символов',
-  })
   about?: string;
 
   @ApiProperty({
-    example: '1990-01-01',
-    description: 'Дата рождения в формате ISO (YYYY-MM-DD)',
+    example: '1990-01-01T00:00:00.000Z',
+    description: 'Дата рождения пользователя в формате ISO',
     required: false,
   })
   @IsOptional()
@@ -70,6 +77,15 @@ export class UpdateUserDto {
     required: false,
   })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({}, { message: 'Некорректный URL аватара' })
   avatar?: string;
+
+  @ApiProperty({
+    example: UserRole.USER,
+    description: 'Роль пользователя в системе',
+    enum: UserRole,
+    enumName: 'UserRole',
+  })
+  @IsEnum(UserRole, { message: 'Недопустимая роль пользователя' })
+  role: UserRole;
 }

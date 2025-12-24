@@ -1,68 +1,145 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
+import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { UserRole } from './users.enums';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UserResponseDto } from './dto/get-user-response.dto';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [
-    {
-      id: '1',
-      email: 'admin@test.com',
-      password: '$2b$10$hc6hOxMc0k9ib05yH2lL9.iKXgLHZ1nabXfveRG9YqQYoBZ5vQ6R2',
-      name: 'Admin',
-      role: UserRole.USER,
-    },
-  ];
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
-  create(createUserDto: CreateUserDto): User {
-    // const newUser = {
-    //   id: this.users.length + 1,
-    //   ...createUserDto,
-    //   password: '$2b$10$hc6hOxMc0k9ib05yH2lL9.iKXgLHZ1nabXfveRG9YqQYoBZ5vQ6R2',
-    // } as User;
-    // this.users.push(newUser);
-
-    //TODO перевести на работу с БД
-    console.log(`createUserDto ${JSON.stringify(createUserDto)}`);
-    return this.users[0];
+  private filterUser(user: User): UserResponseDto {
+    const userResponse = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      about: user.about,
+      birthdate: user.birthdate,
+      city: user.city,
+      gender: user.gender,
+      avatar: user.avatar,
+      role: user.role,
+    };
+    return userResponse;
   }
 
-  findAll(): User[] {
-    return this.users;
-  }
+  private async findUserById(userId: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({
+      id: userId,
+    });
 
-  findOne(id: string): User | undefined {
-    return this.users.find((user) => user.id === id);
-  }
-
-  update(id: string, updateUserDto: UpdateUserDto): User | undefined {
-    const user = this.findOne(id);
-    if (!user) return undefined;
-    Object.assign(user, updateUserDto);
+    if (!user) {
+      throw new NotFoundException(`Пользователь с ID ${userId} не существует`);
+    }
     return user;
   }
 
-  remove(id: string): boolean {
-    const index = this.users.findIndex((user) => user.id === id);
-    if (index === -1) return false;
-    this.users.splice(index, 1);
-    return true;
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+    const user = this.usersRepository.create(createUserDto);
+    const saved = await this.usersRepository.save(user);
+    return this.filterUser(saved);
+  }
+
+  async findAll(): Promise<UserResponseDto[]> {
+    const users = await this.usersRepository.find();
+    return users.map((user) => this.filterUser(user));
+  }
+
+  async findOne(id: string): Promise<UserResponseDto> {
+    const user = await this.findUserById(id);
+    return this.filterUser(user);
+  }
+
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const user = await this.findUserById(id);
+
+    // забираем только ключи, реально пришедшие в запросе (не undefined)
+    const patch = Object.fromEntries(
+      Object.entries(updateUserDto).filter(([, v]) => v !== undefined),
+    );
+
+    const saved = await this.usersRepository.save({ ...user, ...patch });
+    return this.filterUser(saved);
+  }
+
+  async remove(id: string): Promise<{ message: string }> {
+    const result = await this.usersRepository.delete(id);
+    if (!result.affected) {
+      throw new NotFoundException(`Пользователь с ID ${id} не существует`);
+    }
+    return { message: 'Пользователь успешно удалён' };
   }
 
   async refresh(userId: string, newRefreshToken: string) {
-    await new Promise((r) => setTimeout(r, 500));
-    return newRefreshToken;
+    await this.usersRepository.update(userId, {
+      refreshToken: newRefreshToken,
+    });
+    
+    const updatedUser = await this.findUserById(userId);
+    return updatedUser.refreshToken;
   }
 
-  findByEmail(email: string): User | undefined {
-    return this.users.find((user) => user.email === email);
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({
+      email: email,
+    });
+    if (!user) {
+      throw new NotFoundException(
+        `Пользователь с email ${email} не существует`,
+      );
+    }
+    return user;
   }
-  // TODO: Реализовать когда будет подключена БД
-  updatePassword(userId: number, _updatePasswordDto: UpdatePasswordDto) {
-    void _updatePasswordDto; // Заглушка
-    return `This action updates password for user #${userId}`;
+
+  async updatePassword(
+    userId: string,
+    updatePasswordDto: UpdatePasswordDto,
+  ): Promise<{ message: string }> {
+    const user = await this.findUserById(userId);
+    
+    const isOldPasswordValid = await bcrypt.compare(
+      updatePasswordDto.oldPassword,
+      user.password,
+    );
+    
+    if (!isOldPasswordValid) {
+      throw new BadRequestException('Неверный текущий пароль');
+    }
+    
+    const isSamePassword = await bcrypt.compare(
+      updatePasswordDto.newPassword,
+      user.password,
+    );
+    
+    if (isSamePassword) {
+      throw new BadRequestException(
+        'Новый пароль должен отличаться от текущего',
+      );
+    }
+    
+    const hashedPassword = await bcrypt.hash(updatePasswordDto.newPassword, 10);
+    
+    await this.usersRepository.update(userId, {
+      password: hashedPassword,
+      refreshToken: null,
+    });
+    
+    return {
+      message: 'Пароль успешно изменён',
+    };
   }
 }

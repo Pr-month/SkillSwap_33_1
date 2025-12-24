@@ -1,26 +1,124 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Skill } from './entities/skill.entity';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { GetSkillsQueryDto } from './dto/get-skills-query.dto';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 @Injectable()
 export class SkillsService {
-  create(ownerId: string, createSkillDto: CreateSkillDto) {
-    return `This action adds a new skill ${createSkillDto.title} for owner ${ownerId}`;
+  constructor(
+    @InjectRepository(Skill)
+    private skillRepository: Repository<Skill>,
+  ) {}
+
+  async create(
+    ownerId: string,
+    createSkillDto: CreateSkillDto,
+  ): Promise<Skill> {
+    return this.skillRepository.save({
+      title: createSkillDto.title,
+      description: createSkillDto.description,
+      images: createSkillDto.images || [],
+      owner: { id: ownerId },
+      category: { id: createSkillDto.category },
+    });
   }
 
-  findAll() {
-    return `This action returns all skills`;
+  async findAll(query: GetSkillsQueryDto) {
+    const { page = 1, limit = 20, search, category } = query;
+    const queryBuilder = this.skillRepository
+      .createQueryBuilder('skill')
+      .leftJoinAndSelect('skill.owner', 'owner')
+      .leftJoinAndSelect('skill.category', 'category')
+      .leftJoinAndSelect('category.parent', 'parent');
+
+    if (search) {
+      queryBuilder.andWhere(
+        `(LOWER(skill.title) LIKE :search
+          OR LOWER(category.name) LIKE :search
+          OR LOWER(parent.name) LIKE :search)`,
+        { search: `%${search.toLowerCase()}%` },
+      );
+    }
+
+    if (category) {
+      queryBuilder.andWhere(
+        '(category.id = :category OR parent.id = :category)',
+        { category },
+      );
+    }
+
+    const skip = (page - 1) * limit;
+    const [data, total] = await queryBuilder
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    const totalPages = Math.ceil(total / limit);
+    if (page > totalPages && totalPages > 0) {
+      throw new NotFoundException(
+        `Страница ${page} не найдена. Всего страниц: ${totalPages}`,
+      );
+    }
+
+    return {
+      data,
+      page,
+      totalPages,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} skill`;
+  async findOne(id: string): Promise<Skill> {
+    const skill = await this.skillRepository.findOne({
+      where: { id },
+      relations: ['owner', 'category', 'category.parent'],
+    });
+    if (!skill) {
+      throw new NotFoundException(`Skill with id ${id} not found`);
+    }
+    return skill;
   }
 
-  update(ownerId: string, id: number, updateSkillDto: UpdateSkillDto) {
-    return `This action updates a #${id} skill with ${JSON.stringify(updateSkillDto)} for ${ownerId}`;
+  async update(
+    userId: string,
+    id: string,
+    updateSkillDto: UpdateSkillDto,
+  ): Promise<Skill> {
+    const skill = await this.findOne(id);
+    if (skill.owner.id !== userId) {
+      throw new ForbiddenException('You can only update your own skills');
+    }
+    Object.assign(skill, updateSkillDto);
+    return this.skillRepository.save(skill);
   }
 
-  remove(ownerId: string, id: number) {
-    return `This action removes a #${id} skill for ${ownerId}`;
+  async remove(userId: string, id: string): Promise<{ message: string }> {
+    const skill = await this.findOne(id);
+    if (skill.owner.id !== userId) {
+      throw new ForbiddenException('You can only delete your own skills');
+    }
+
+    if (skill.images?.length) {
+      for (const image of skill.images) {
+        const imagePath = path.join(process.cwd(), image);
+        try {
+          await fs.access(imagePath);
+          await fs.unlink(imagePath);
+        } catch {
+          // Файл уже удалён или не существует — игнорируем
+        }
+      }
+    }
+
+    await this.skillRepository.delete(id);
+    return { message: 'Навык успешно удалён' };
   }
 }

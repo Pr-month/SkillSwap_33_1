@@ -9,6 +9,7 @@ import { AppController } from './app.controller';
 import { dbConfig } from './config/db.config';
 import { appConfig } from './config/app.config';
 import { jwtConfig } from './config/jwt.config';
+import { envValidationSchema } from './config/env.validation';
 import { type JwtConfig, type DbConfig } from './config/types';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -23,6 +24,11 @@ import { FilesModule } from './files/files.module';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, jwtConfig, dbConfig],
+      validationSchema: envValidationSchema,
+      validationOptions: {
+        abortEarly: false,
+        allowUnknown: true,
+      },
     }),
     TypeOrmModule.forRootAsync({
       inject: [dbConfig.KEY],

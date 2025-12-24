@@ -1,11 +1,12 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { jwtConfig as jwtCnf } from 'src/config/jwt.config';
-import { JwtConfig } from 'src/config/types';
-import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { jwtConfig as jwtCnf } from '../config/jwt.config';
+import { JwtConfig } from '../config/types';
+import { UsersService } from '../users/users.service';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
+import { TJwtPayload } from './types';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +16,7 @@ export class AuthService {
     private usersService: UsersService,
   ) {}
 
-  private generateTokens(payload: any) {
+  private generateTokens(payload: TJwtPayload) {
     const accessToken = this.jwtService.sign(payload, {
       secret: this.jwtConfig.secret,
       expiresIn: this.jwtConfig.expiresIn,
@@ -29,52 +30,50 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  //Заменить на тип TJwtPayload при готовности
-  async refresh(user: { sub: string }) {
-    const { accessToken, refreshToken } = this.generateTokens(user);
+  async refresh(user: TJwtPayload) {
+    const { accessToken, refreshToken } = this.generateTokens({
+      sub: user.sub,
+      email: user.email,
+      role: user.role,
+    });
     await this.usersService.refresh(user.sub, refreshToken);
     return { accessToken, refreshToken };
   }
-  login(user: Omit<User, 'password'>) {
-    const payload = { email: user.email, sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
-  }
-  async validateUser(
-    email: string,
-    password: string,
-  ): Promise<Omit<User, 'password'> | null> {
-    const user = this.usersService.findByEmail(email);
-    if (!user) {
-      return null;
-    }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (isPasswordValid) {
-      return {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      };
-    }
-    return null;
+
+  async login(loginData: LoginDto) {
+    const user = await this.validateUser(loginData.email, loginData.password);
+    const { accessToken, refreshToken } = await this.refresh({
+      sub: user.sub,
+      role: user.role,
+      email: user.email,
+    });
+    return { accessToken, refreshToken };
   }
 
-  async register(dto: CreateAuthDto) {
-    //TODO добавить await после перехода на БД
-    const existing = this.usersService.findByEmail(dto.email);
-    if (existing) {
-      throw new BadRequestException(
-        'Пользователь с таким email уже существует',
-      );
+  async validateUser(email: string, password: string): Promise<TJwtPayload> {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
     }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    return {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+  }
+
+  async register(dto: CreateUserDto) {
     const hash = await bcrypt.hash(dto.password, 10);
-    //TODO добавить await после перехода на БД
-    const user = this.usersService.create({
+    await this.usersService.create({
       ...dto,
       password: hash,
     });
-    return this.login(user);
+    return this.login(dto);
   }
 }
