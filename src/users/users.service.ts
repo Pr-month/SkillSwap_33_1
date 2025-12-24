@@ -76,12 +76,12 @@ export class UsersService {
     return this.filterUser(saved);
   }
 
-  async remove(id: string): Promise<boolean> {
+  async remove(id: string): Promise<{ message: string }> {
     const result = await this.usersRepository.delete(id);
     if (!result.affected) {
       throw new NotFoundException(`Пользователь с ID ${id} не существует`);
     }
-    return true;
+    return { message: 'Пользователь успешно удалён' };
   }
 
   async refresh(userId: string, newRefreshToken: string) {
