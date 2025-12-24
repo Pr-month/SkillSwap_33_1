@@ -169,4 +169,52 @@ export class SkillsController {
     const ownerId = req.user.sub;
     return this.skillsService.remove(ownerId, id);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Добавить навык в избранное' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'ID навыка',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Навык добавлен в избранное',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Навык не найден',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Навык уже в избранном',
+  })
+  @Post(':id/favorite')
+  addToFavorite(@Param('id') id: string, @Req() req: TAuthResponse) {
+    const userId = req.user.sub;
+    return this.skillsService.addToFavorite(userId, id);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Удалить навык из избранного' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'ID навыка',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Навык удалён из избранного',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Навык не найден в избранном',
+  })
+  @Delete(':id/favorite')
+  removeFromFavorite(@Param('id') id: string, @Req() req: TAuthResponse) {
+    const userId = req.user.sub;
+    return this.skillsService.removeFromFavorite(userId, id);
+  }
 }
