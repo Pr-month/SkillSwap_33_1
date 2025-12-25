@@ -6,5 +6,5 @@ export class CreateCategoryDto {
 
   @IsUUID()
   @IsOptional()
-  parentId?: string;
+  parentId?: string | null;
 }
