@@ -32,7 +32,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 @Controller('users')
 @ApiBearerAuth()
 @UseGuards(AccessTokenGuard, RolesGuard)
-@Roles(UserRole.ADMIN)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -76,6 +75,7 @@ export class UsersController {
     return this.usersService.updatePassword(userId, updatePasswordDto);
   }
 
+  @Roles(UserRole.ADMIN)
   @Post()
   @ApiOperation({
     summary: 'Создать пользователя (админ или системный сценарий)',
@@ -98,6 +98,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Roles(UserRole.ADMIN)
   @Get(':id')
   @ApiOperation({ summary: 'Получить пользователя по id' })
   @ApiParam({
@@ -114,6 +115,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @Roles(UserRole.ADMIN)
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить пользователя по id' })
   @ApiParam({
@@ -131,6 +133,7 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
+  @Roles(UserRole.ADMIN)
   @Delete(':id')
   @ApiOperation({ summary: 'Удалить пользователя' })
   @ApiParam({
