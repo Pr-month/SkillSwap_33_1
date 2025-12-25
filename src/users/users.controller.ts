@@ -89,11 +89,11 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @Roles(UserRole.USER, UserRole.ADMIN)
   @Get()
   @ApiOperation({ summary: 'Получить список пользователей' })
   @ApiResponse({ status: 200, description: 'Список пользователей' })
   @ApiResponse({ status: 401, description: 'Неавторизован' })
-  @ApiResponse({ status: 403, description: 'Доступ запрещён (не админ)' })
   findAll() {
     return this.usersService.findAll();
   }
