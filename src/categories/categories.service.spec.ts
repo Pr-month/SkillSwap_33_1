@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DeleteResult } from 'typeorm';
 import { CategoriesService } from './categories.service';
 import { Category } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -242,7 +243,9 @@ describe('CategoriesService', () => {
 
   describe('remove', () => {
     it('should delete category by id', async () => {
-      repository.delete.mockResolvedValue({ affected: 1 } as any);
+      const mockDeleteResult: DeleteResult = { affected: 1, raw: {} };
+
+      repository.delete.mockResolvedValue(mockDeleteResult);
 
       await service.remove('cat-1');
 
