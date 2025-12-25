@@ -15,12 +15,14 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SkillsModule } from './skills/skills.module';
 import { FilesModule } from './files/files.module';
+import { CitiesModule } from './cities/cities.module';
 
 @Module({
   imports: [
     AuthModule,
     UsersModule,
     SkillsModule,
+    CitiesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, jwtConfig, dbConfig],

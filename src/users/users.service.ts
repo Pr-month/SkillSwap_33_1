@@ -88,7 +88,7 @@ export class UsersService {
     await this.usersRepository.update(userId, {
       refreshToken: newRefreshToken,
     });
-    
+
     const updatedUser = await this.findUserById(userId);
     return updatedUser.refreshToken;
   }
@@ -110,34 +110,34 @@ export class UsersService {
     updatePasswordDto: UpdatePasswordDto,
   ): Promise<{ message: string }> {
     const user = await this.findUserById(userId);
-    
+
     const isOldPasswordValid = await bcrypt.compare(
       updatePasswordDto.oldPassword,
       user.password,
     );
-    
+
     if (!isOldPasswordValid) {
       throw new BadRequestException('Неверный текущий пароль');
     }
-    
+
     const isSamePassword = await bcrypt.compare(
       updatePasswordDto.newPassword,
       user.password,
     );
-    
+
     if (isSamePassword) {
       throw new BadRequestException(
         'Новый пароль должен отличаться от текущего',
       );
     }
-    
+
     const hashedPassword = await bcrypt.hash(updatePasswordDto.newPassword, 10);
-    
+
     await this.usersRepository.update(userId, {
       password: hashedPassword,
       refreshToken: null,
     });
-    
+
     return {
       message: 'Пароль успешно изменён',
     };
