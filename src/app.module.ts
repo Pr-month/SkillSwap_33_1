@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SkillsModule } from './skills/skills.module';
 import { FilesModule } from './files/files.module';
+import { RequestsModule } from './requests/requests.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { FilesModule } from './files/files.module';
       }),
     }),
     FilesModule,
+    RequestsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
