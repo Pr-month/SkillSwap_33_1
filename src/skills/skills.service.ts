@@ -141,12 +141,13 @@ export class SkillsService {
       throw new NotFoundException('Пользователь не найден');
     }
 
-    const alreadyFavorite = user.favoriteSkills.some((s) => s.id === skillId);
+    const favoriteSkills = user.favoriteSkills as Skill[];
+    const alreadyFavorite = favoriteSkills.some((s) => s.id === skillId);
     if (alreadyFavorite) {
       throw new ConflictException('Навык уже в избранном');
     }
 
-    user.favoriteSkills.push(skill);
+    favoriteSkills.push(skill);
     await this.userRepository.save(user);
 
     return { message: 'Навык добавлен в избранное' };
@@ -165,14 +166,13 @@ export class SkillsService {
       throw new NotFoundException('Пользователь не найден');
     }
 
-    const favoriteIndex = user.favoriteSkills.findIndex(
-      (s) => s.id === skillId,
-    );
+    const favoriteSkills = user.favoriteSkills as Skill[];
+    const favoriteIndex = favoriteSkills.findIndex((s) => s.id === skillId);
     if (favoriteIndex === -1) {
       throw new NotFoundException('Навык не найден в избранном');
     }
 
-    user.favoriteSkills.splice(favoriteIndex, 1);
+    favoriteSkills.splice(favoriteIndex, 1);
     await this.userRepository.save(user);
 
     return { message: 'Навык удалён из избранного' };
