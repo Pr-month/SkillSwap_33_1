@@ -3,8 +3,8 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToMany,
-  //   JoinTable,
-  //   ManyToMany,
+  JoinTable,
+  ManyToMany,
 } from 'typeorm';
 import { Gender } from '../users.enums';
 import { Skill } from '../../skills/entities/skill.entity';
@@ -43,6 +43,14 @@ export class User {
 
   @OneToMany(() => Skill, (skill) => skill.owner)
   skills: Skill[];
+
+  @ManyToMany(() => Skill)
+  @JoinTable({
+    name: 'user_favorite_skills',
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'skillId', referencedColumnName: 'id' },
+  })
+  favoriteSkills: Skill[];
 
   @Column({
     type: 'enum',
