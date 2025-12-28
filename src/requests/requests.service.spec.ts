@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { RequestsService } from './requests.service';
 import { Request } from './entities/request.entity';
+import { Skill } from '../skills/entities/skill.entity';
 
 describe('RequestsService', () => {
   let service: RequestsService;
@@ -14,6 +15,10 @@ describe('RequestsService', () => {
     delete: jest.fn(),
   };
 
+  const mockSkillRepository = {
+    findOne: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -21,6 +26,10 @@ describe('RequestsService', () => {
         {
           provide: getRepositoryToken(Request),
           useValue: mockRequestRepository,
+        },
+        {
+          provide: getRepositoryToken(Skill),
+          useValue: mockSkillRepository,
         },
       ],
     }).compile();

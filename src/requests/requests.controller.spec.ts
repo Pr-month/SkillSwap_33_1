@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { RequestsController } from './requests.controller';
 import { RequestsService } from './requests.service';
 import { Request } from './entities/request.entity';
+import { Skill } from '../skills/entities/skill.entity';
 
 describe('RequestsController', () => {
   let controller: RequestsController;
@@ -15,6 +16,10 @@ describe('RequestsController', () => {
     delete: jest.fn(),
   };
 
+  const mockSkillRepository = {
+    findOne: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RequestsController],
@@ -23,6 +28,10 @@ describe('RequestsController', () => {
         {
           provide: getRepositoryToken(Request),
           useValue: mockRequestRepository,
+        },
+        {
+          provide: getRepositoryToken(Skill),
+          useValue: mockSkillRepository,
         },
       ],
     }).compile();
