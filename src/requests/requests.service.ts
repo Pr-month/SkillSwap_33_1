@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Request } from './entities/request.entity';
+import { Skill } from '../skills/entities/skill.entity';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { RequestStatus } from './requests.enum';
@@ -16,19 +17,32 @@ export class RequestsService {
   constructor(
     @InjectRepository(Request)
     private requestsRepository: Repository<Request>,
+    @InjectRepository(Skill)
+    private skillsRepository: Repository<Skill>,
   ) {}
 
   async create(
     createRequestDto: CreateRequestDto,
     senderId: string,
   ): Promise<Request> {
-    if (senderId === createRequestDto.receiverId) {
+    const requestedSkill = await this.skillsRepository.findOne({
+      where: { id: createRequestDto.requestedSkillId },
+      relations: ['owner'],
+    });
+
+    if (!requestedSkill) {
+      throw new NotFoundException('Запрашиваемый навык не найден');
+    }
+
+    const receiverId = requestedSkill.owner.id;
+
+    if (senderId === receiverId) {
       throw new BadRequestException('Нельзя отправить заявку самому себе');
     }
 
     const request = this.requestsRepository.create({
       sender: { id: senderId },
-      receiver: { id: createRequestDto.receiverId },
+      receiver: { id: receiverId },
       offeredSkill: { id: createRequestDto.offeredSkillId },
       requestedSkill: { id: createRequestDto.requestedSkillId },
     });
