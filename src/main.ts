@@ -15,6 +15,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const appConfig = configService.get<AppConfig>('APP_CONFIG');
 
+  app.use(helmet());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -25,8 +27,6 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionFilter());
   app.useStaticAssets(join(__dirname, '..', 'public'));
-
-  app.use(helmet());
 
   const config = new DocumentBuilder()
     .setTitle('SkillSwap API')
