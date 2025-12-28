@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SkillsModule } from './skills/skills.module';
 import { FilesModule } from './files/files.module';
+import { CategoriesModule } from './categories/categories.module';
 import { CitiesModule } from './cities/cities.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { CitiesModule } from './cities/cities.module';
     AuthModule,
     UsersModule,
     SkillsModule,
+    CategoriesModule,
     CitiesModule,
     ConfigModule.forRoot({
       isGlobal: true,
