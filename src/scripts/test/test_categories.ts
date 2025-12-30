@@ -1,4 +1,4 @@
-import { Category } from '../src/categories/entities/category.entity';
+import { Category } from '../../categories/entities/category.entity';
 
 export type CategoryLike = Omit<Category, 'parent' | 'children'> & {
   parent: Pick<Category, 'id'> | null;

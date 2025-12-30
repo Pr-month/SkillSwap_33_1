@@ -1,6 +1,6 @@
-import { UserRole } from '../src/auth/roles.enum';
-import { User } from '../src/users/entities/user.entity';
-import { Gender } from '../src/users/users.enums';
+import { UserRole } from '../../auth/roles.enum';
+import { User } from '../../users/entities/user.entity';
+import { Gender } from '../../users/users.enums';
 import * as bcrypt from 'bcrypt';
 import skills from './test_skills';
 

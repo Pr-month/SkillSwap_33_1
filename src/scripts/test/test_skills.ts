@@ -1,6 +1,6 @@
-import { Category } from '../src/categories/entities/category.entity';
-import { Skill } from '../src/skills/entities/skill.entity';
-import { User } from '../src/users/entities/user.entity';
+import { Category } from '../../categories/entities/category.entity';
+import { Skill } from '../../skills/entities/skill.entity';
+import { User } from '../../users/entities/user.entity';
 
 const skills: Skill[] = [
   {

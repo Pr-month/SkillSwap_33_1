@@ -2,10 +2,10 @@ import { DataSource } from 'typeorm';
 import { users, usersWithSkills } from './test_users';
 import categories from './test_categories';
 import skills from './test_skills';
-import { User } from '../src/users/entities/user.entity';
-import { Category } from '../src/categories/entities/category.entity';
-import { Skill } from '../src/skills/entities/skill.entity';
-import dataSource from '../src/config/db.config';
+import { User } from '../../users/entities/user.entity';
+import { Category } from '../../categories/entities/category.entity';
+import { Skill } from '../../skills/entities/skill.entity';
+import dataSource from '../../config/db.config';
 
 async function resetDatabase() {
   try {
