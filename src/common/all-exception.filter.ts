@@ -40,6 +40,9 @@ export class AllExceptionFilter implements ExceptionFilter {
         status = HttpStatus.CONFLICT;
         message = 'Duplicate entry';
       }
+    } else if (this.isCsrfError(exception)) {
+      status = HttpStatus.FORBIDDEN;
+      message = 'Invalid CSRF token';
     }
 
     response.status(status).json({
@@ -48,5 +51,14 @@ export class AllExceptionFilter implements ExceptionFilter {
       path: request.url,
       timestamp: new Date().toISOString(),
     });
+  }
+
+  private isCsrfError(exception: unknown): boolean {
+    return (
+      typeof exception === 'object' &&
+      exception !== null &&
+      'code' in exception &&
+      exception.code === 'EBADCSRFTOKEN'
+    );
   }
 }
