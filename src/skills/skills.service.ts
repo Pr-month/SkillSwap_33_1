@@ -141,7 +141,7 @@ export class SkillsService {
       throw new NotFoundException('Пользователь не найден');
     }
 
-    const favoriteSkills = user.favoriteSkills as Skill[];
+    const favoriteSkills = user.favoriteSkills;
     const alreadyFavorite = favoriteSkills.some((s) => s.id === skillId);
     if (alreadyFavorite) {
       throw new ConflictException('Навык уже в избранном');
@@ -166,7 +166,7 @@ export class SkillsService {
       throw new NotFoundException('Пользователь не найден');
     }
 
-    const favoriteSkills = user.favoriteSkills as Skill[];
+    const favoriteSkills = user.favoriteSkills;
     const favoriteIndex = favoriteSkills.findIndex((s) => s.id === skillId);
     if (favoriteIndex === -1) {
       throw new NotFoundException('Навык не найден в избранном');
