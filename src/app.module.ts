@@ -15,12 +15,17 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SkillsModule } from './skills/skills.module';
 import { FilesModule } from './files/files.module';
+import { RequestsModule } from './requests/requests.module';
+import { CategoriesModule } from './categories/categories.module';
+import { CitiesModule } from './cities/cities.module';
 
 @Module({
   imports: [
     AuthModule,
     UsersModule,
     SkillsModule,
+    CategoriesModule,
+    CitiesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, jwtConfig, dbConfig],
@@ -43,6 +48,7 @@ import { FilesModule } from './files/files.module';
       }),
     }),
     FilesModule,
+    RequestsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

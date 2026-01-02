@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -11,12 +12,15 @@ import { UpdateSkillDto } from './dto/update-skill.dto';
 import { GetSkillsQueryDto } from './dto/get-skills-query.dto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class SkillsService {
   constructor(
     @InjectRepository(Skill)
     private skillRepository: Repository<Skill>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async create(
@@ -120,5 +124,57 @@ export class SkillsService {
 
     await this.skillRepository.delete(id);
     return { message: 'Навык успешно удалён' };
+  }
+
+  async addToFavorite(
+    userId: string,
+    skillId: string,
+  ): Promise<{ message: string }> {
+    const skill = await this.findOne(skillId);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['favoriteSkills'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+
+    const favoriteSkills = user.favoriteSkills;
+    const alreadyFavorite = favoriteSkills.some((s) => s.id === skillId);
+    if (alreadyFavorite) {
+      throw new ConflictException('Навык уже в избранном');
+    }
+
+    favoriteSkills.push(skill);
+    await this.userRepository.save(user);
+
+    return { message: 'Навык добавлен в избранное' };
+  }
+
+  async removeFromFavorite(
+    userId: string,
+    skillId: string,
+  ): Promise<{ message: string }> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['favoriteSkills'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+
+    const favoriteSkills = user.favoriteSkills;
+    const favoriteIndex = favoriteSkills.findIndex((s) => s.id === skillId);
+    if (favoriteIndex === -1) {
+      throw new NotFoundException('Навык не найден в избранном');
+    }
+
+    favoriteSkills.splice(favoriteIndex, 1);
+    await this.userRepository.save(user);
+
+    return { message: 'Навык удалён из избранного' };
   }
 }

@@ -1,54 +1,21 @@
 import {
   Controller,
   Post,
-  UseInterceptors,
   UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuid } from 'uuid';
-import {
-  ApiBody,
-  ApiConsumes,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiUploadFile } from './files.swagger';
 
 @ApiTags('Files')
 @Controller('files')
 export class FilesController {
   @Post('upload')
-  @ApiOperation({ summary: 'Загрузить изображение' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'Файл изображения (jpeg, png, gif, webp) до 2 МБ',
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-      required: ['file'],
-    },
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Файл успешно загружен, возвращается URL',
-    schema: {
-      type: 'object',
-      properties: {
-        url: {
-          type: 'string',
-          example: '/uploads/drums-1.png',
-          description: 'Путь к загруженному файлу',
-        },
-      },
-    },
-  })
+  @ApiUploadFile()
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
