@@ -1,17 +1,18 @@
 import { registerAs } from '@nestjs/config';
-import { DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 
-export const dbConfig = registerAs(
-  'DB_CONFIG',
-  (): DataSourceOptions => ({
-    type: 'postgres',
-    applicationName: 'skillswap',
-    host: process.env.DB_HOST || 'localhost',
-    port: Number(process.env.DB_PORT) || 5432,
-    username: process.env.DB_USERNAME || 'postgres',
-    password: process.env.DB_PASSWORD || 'password',
-    database: process.env.DB_NAME || 'skillswap',
-    synchronize: process.env.NODE_ENV !== 'production',
-    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  }),
-);
+const getDataSourceOptions = (): DataSourceOptions => ({
+  type: 'postgres',
+  applicationName: 'skillswap',
+  host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT) || 5432,
+  username: process.env.DB_USERNAME || 'postgres',
+  password: process.env.DB_PASSWORD || 'password',
+  database: process.env.DB_NAME || 'skillswap',
+  synchronize: process.env.NODE_ENV !== 'production',
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+});
+
+export const dbConfig = registerAs('DB_CONFIG', getDataSourceOptions);
+
+export default new DataSource(getDataSourceOptions());
