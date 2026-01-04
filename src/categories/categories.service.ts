@@ -19,7 +19,7 @@ export class CategoriesService {
       const parent = await this.categoryRepository.findOneBy({
         id: createCategoryDto.parentId,
       });
-      if (!parent) throw new NotFoundException('Рождительская категория не найдена');
+      if (!parent) throw new NotFoundException('Родительская категория не найдена');
       category.parent = parent;
     }
 
