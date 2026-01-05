@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
@@ -19,7 +19,7 @@ export class CategoriesService {
       const parent = await this.categoryRepository.findOneBy({
         id: createCategoryDto.parentId,
       });
-      if (!parent) throw new Error('Parent category not found');
+      if (!parent) throw new NotFoundException('Родительская категория не найдена');
       category.parent = parent;
     }
 
@@ -37,7 +37,7 @@ export class CategoriesService {
       where: { id },
       relations: ['children', 'parent'],
     });
-    if (!category) throw new Error('Category not found');
+    if (!category) throw new NotFoundException('Категория не найдена');
     return category;
   }
 
@@ -55,7 +55,7 @@ export class CategoriesService {
         const parent = await this.categoryRepository.findOneBy({
           id: parentId,
         });
-        if (!parent) throw new Error('Parent category not found');
+        if (!parent) throw new NotFoundException('Родительская категорий не найдена');
         category.parent = parent;
       }
     }
