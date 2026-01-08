@@ -11,6 +11,7 @@ import { Skill } from '../skills/entities/skill.entity';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { RequestStatus } from './requests.enum';
+import { NotificationsGateway } from 'src/websocket/gateways/notifications.gateway';
 
 @Injectable()
 export class RequestsService {
@@ -19,6 +20,7 @@ export class RequestsService {
     private requestsRepository: Repository<Request>,
     @InjectRepository(Skill)
     private skillsRepository: Repository<Skill>,
+    private notificationsWs: NotificationsGateway,
   ) {}
 
   async create(
@@ -46,6 +48,11 @@ export class RequestsService {
       offeredSkill: { id: createRequestDto.offeredSkillId },
       requestedSkill: { id: createRequestDto.requestedSkillId },
     });
+
+    this.notificationsWs.sendNotification(
+      request.receiver.id,
+      `Уведомление заглушка ${request.createdAt.toLocaleString('ru-RU')}`,
+    );
 
     return this.requestsRepository.save(request);
   }

@@ -43,6 +43,8 @@ export class AllExceptionFilter implements ExceptionFilter {
         status = HttpStatus.BAD_REQUEST;
         message = exception.message;
       }
+    } else {
+      console.error(exception);
     }
 
     response.status(status).json({

@@ -18,6 +18,7 @@ import { FilesModule } from './files/files.module';
 import { RequestsModule } from './requests/requests.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CitiesModule } from './cities/cities.module';
+import { WebSocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { CitiesModule } from './cities/cities.module';
     }),
     FilesModule,
     RequestsModule,
+    WebSocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],
