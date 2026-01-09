@@ -5,6 +5,7 @@ import { JwtConfig } from 'src/config/types';
 import { Socket } from 'socket.io';
 
 export class BaseGateway {
+  //Это наверно в целом стоит сделать лучше
   protected clientsMap = new Map<string, Set<string>>();
   protected usersMap = new Map<string, string>();
 
@@ -35,9 +36,11 @@ export class BaseGateway {
     if (userClients.size === 0) this.clientsMap.delete(userId);
   }
 
+  //Аутентификацию можно вынести в socket.io миддлвар
   private verify(client: Socket): Promise<TJwtPayload> {
     const token = this.extractToken(client);
 
+    //Обработку ошибок еще предстоить добавить
     if (!token) throw new UnauthorizedException('Token not provided');
 
     return this.jwtService.verifyAsync<TJwtPayload>(token, {

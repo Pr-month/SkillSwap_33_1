@@ -18,6 +18,8 @@ export class NotificationsGateway extends BaseGateway {
     super(jwtService, jwtConfig);
   }
 
+  //Базовый метод показывающий пример как отправлять уведомления на клиенты
+  //Дто уведомлений и логику составления оповещений в подходящем формате еще надо будет добавить
   sendNotification(userId: string, notification: string) {
     const userClients = this.clientsMap.get(userId);
     if (!userClients) return;
