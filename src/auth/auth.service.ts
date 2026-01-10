@@ -74,4 +74,8 @@ export class AuthService {
     });
     return this.login(dto);
   }
+
+  logout(userId: string) {
+    return this.usersService.refresh(userId, null);
+  }
 }

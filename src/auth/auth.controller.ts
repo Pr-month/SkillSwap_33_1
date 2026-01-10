@@ -5,7 +5,6 @@ import {
   HttpStatus,
   Post,
   Request,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -55,10 +54,8 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('access-token')
   @ApiLogout()
-  async logout(@Request() req: TAuthResponse, @Res() res: Response) {
-    await Promise.resolve(); // Заглушка для ESLint
-    return res.status(200).json({
-      message: 'Успешный выход из системы',
-    });
+  logout(@Request() req: TAuthResponse) {
+    const { user } = req;
+    return this.authService.logout(user.sub);
   }
 }
