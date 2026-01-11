@@ -11,7 +11,8 @@ import { Skill } from '../skills/entities/skill.entity';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { RequestStatus } from './requests.enum';
-import { NotificationsGateway } from 'src/websocket/gateways/notifications.gateway';
+import { NotificationsGateway } from 'src/websocket/gateways/notifications/notifications.gateway';
+import { NotificationTypes } from 'src/websocket/gateways/notifications/types';
 
 @Injectable()
 export class RequestsService {
@@ -49,10 +50,11 @@ export class RequestsService {
       requestedSkill: { id: createRequestDto.requestedSkillId },
     });
 
-    this.notificationsWs.sendNotification(
-      request.receiver.id,
-      `Уведомление заглушка ${request.createdAt.toLocaleString('ru-RU')}`,
-    );
+    this.notificationsWs.sendNotification(request.receiver.id, {
+      type: NotificationTypes.New,
+      createdAt: request.createdAt,
+      fromUser: request.sender.name,
+    });
 
     return this.requestsRepository.save(request);
   }
@@ -101,6 +103,24 @@ export class RequestsService {
 
     request.status = updateRequestDto.status;
     request.isRead = true;
+
+    let notificationType: NotificationTypes | null = null;
+    switch (request.status) {
+      case RequestStatus.ACCEPTED:
+        notificationType = NotificationTypes.Accepted;
+        break;
+      case RequestStatus.REJECTED:
+        notificationType = NotificationTypes.Rejected;
+        break;
+    }
+
+    if (notificationType) {
+      this.notificationsWs.sendNotification(request.sender.id, {
+        type: notificationType,
+        createdAt: new Date(),
+        fromUser: request.receiver.name,
+      });
+    }
 
     return this.requestsRepository.save(request);
   }
