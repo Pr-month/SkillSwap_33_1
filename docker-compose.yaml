@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: skillswap
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      target: development
+    ports:
+      - '3000:3000'
+    env_file: .env
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://postgres:12345@postgres:5432/skillswap?schema=public
+    command: >  # ← TCP проверка (работает везде!)
+      sh -c "until nc -z postgres 5432; do echo 'Waiting for PostgreSQL...'; sleep 2; done; echo 'PostgreSQL ready!'; npm run start"
+
+volumes:
+  postgres_data:
