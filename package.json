@@ -17,7 +17,12 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "npm run test:reset && dotenv -e .env.test.local -- jest --config ./test/jest-e2e.json",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "schema:drop": "npm run typeorm schema:drop -- -d src/config/db.config.ts",
+    "test-db:drop": "dotenv -e .env.test.local -- npm run schema:drop",
+    "test-db:init": "dotenv -e .env.test.local -- ts-node src/scripts/test/reset-test-db.ts",
+    "test:reset": "npm run test-db:drop && npm run test-db:init"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -34,6 +39,8 @@
     "class-validator": "^0.14.3",
     "cookie-parser": "^1.4.7",
     "csrf-csrf": "^4.0.3",
+    "dotenv": "^17.2.3",
+    "helmet": "^8.1.0",
     "multer": "^2.0.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
@@ -63,6 +70,7 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.2",
     "@types/winston": "^2.4.4",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",

@@ -7,6 +7,7 @@ import { join } from 'path';
 import * as cookieParser from 'cookie-parser';
 import { doubleCsrfProtection } from './csrf/csrf';
 import { Request, Response, NextFunction } from 'express';
+import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { AppConfig } from './config/types';
@@ -17,6 +18,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const appConfig = configService.get<AppConfig>('APP_CONFIG');
 
+  app.use(helmet());
   app.use(cookieParser());
 
   app.enableCors({
@@ -51,9 +53,9 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // удаляет поля без валидаторов
-      forbidNonWhitelisted: true, // бросает 400, если прислали лишнее
-      transform: true, // преобразует типы по DTO
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
     }),
   );
 
@@ -90,6 +92,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document, {
     jsonDocumentUrl: 'api-json',
   });
+
   await app.listen(appConfig?.port ?? 3000);
 }
 

@@ -2,11 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { SkillsService } from './skills.service';
 import { Skill } from './entities/skill.entity';
+import { User } from '../users/entities/user.entity';
 
 describe('SkillsService', () => {
   let service: SkillsService;
 
-  const mockRepository = {
+  const mockSkillRepository = {
     create: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
@@ -20,13 +21,22 @@ describe('SkillsService', () => {
     }),
   };
 
+  const mockUserRepository = {
+    findOne: jest.fn(),
+    save: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SkillsService,
         {
           provide: getRepositoryToken(Skill),
-          useValue: mockRepository,
+          useValue: mockSkillRepository,
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: mockUserRepository,
         },
       ],
     }).compile();

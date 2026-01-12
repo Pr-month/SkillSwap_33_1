@@ -39,6 +39,9 @@ export class AllExceptionFilter implements ExceptionFilter {
       if (err.code === '23505') {
         status = HttpStatus.CONFLICT;
         message = 'Duplicate entry';
+      } else if (err.code === '22P02') {
+        status = HttpStatus.BAD_REQUEST;
+        message = exception.message;
       }
     } else if (this.isCsrfError(exception)) {
       status = HttpStatus.FORBIDDEN;
