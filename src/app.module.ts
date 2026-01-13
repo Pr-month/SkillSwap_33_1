@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SkillsModule } from './skills/skills.module';
 import { FilesModule } from './files/files.module';
+import { CsrfController } from './csrf/csrf.controller';
 import { RequestsModule } from './requests/requests.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CitiesModule } from './cities/cities.module';
@@ -50,7 +51,7 @@ import { CitiesModule } from './cities/cities.module';
     FilesModule,
     RequestsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, CsrfController],
   providers: [AppService],
 })
 export class AppModule {}
