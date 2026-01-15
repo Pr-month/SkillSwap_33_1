@@ -8,7 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { Response } from 'express';
 import { AuthService } from './auth.service';
 import {
   ApiLogin,
