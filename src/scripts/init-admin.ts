@@ -1,3 +1,4 @@
+import { UserRole } from 'src/auth/roles.enum';
 import dataSource from 'src/config/db.config';
 import { User } from 'src/users/entities/user.entity';
 
@@ -12,7 +13,7 @@ async function initAdmin() {
 
   const repository = dataSource.getRepository(User);
 
-  return await repository.save({ email, password });
+  return await repository.save({ email, password, role: UserRole.ADMIN });
 }
 
 initAdmin().catch((e) => console.error(e));
