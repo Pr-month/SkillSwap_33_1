@@ -88,7 +88,7 @@ export class UsersService {
     return { message: 'Пользователь успешно удалён' };
   }
 
-  async refresh(userId: string, newRefreshToken: string) {
+  async refresh(userId: string, newRefreshToken: string | null) {
     await this.usersRepository.update(userId, {
       refreshToken: newRefreshToken,
     });
