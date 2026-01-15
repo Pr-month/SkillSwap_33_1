@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -18,8 +19,11 @@ import {
   ApiGetCategoryById,
   ApiUpdateCategory,
 } from './categories.swagger';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('categories')
+@UseGuards(AccessTokenGuard)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
@@ -31,6 +35,7 @@ export class CategoriesController {
 
   @Get()
   @ApiGetAllCategories()
+  @Public()
   findAll(): Promise<Category[]> {
     return this.categoriesService.findAll();
   }
