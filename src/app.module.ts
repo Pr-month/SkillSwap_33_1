@@ -19,6 +19,7 @@ import { CsrfController } from './csrf/csrf.controller';
 import { RequestsModule } from './requests/requests.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CitiesModule } from './cities/cities.module';
+import { GlossariesModule } from './glossaries/glossaries.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CitiesModule } from './cities/cities.module';
     SkillsModule,
     CategoriesModule,
     CitiesModule,
+    GlossariesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, jwtConfig, dbConfig],
