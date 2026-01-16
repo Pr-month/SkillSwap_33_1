@@ -22,7 +22,8 @@
     "schema:drop": "npm run typeorm schema:drop -- -d src/config/db.config.ts",
     "test-db:drop": "dotenv -e .env.test.local -- npm run schema:drop",
     "test-db:init": "dotenv -e .env.test.local -- ts-node src/scripts/test/reset-test-db.ts",
-    "test:reset": "npm run test-db:drop && npm run test-db:init"
+    "test:reset": "npm run test-db:drop && npm run test-db:init",
+    "init-admin": "dotenv -e .env -- ts-node -r tsconfig-paths/register src/scripts/init-admin.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
