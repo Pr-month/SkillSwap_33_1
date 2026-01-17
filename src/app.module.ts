@@ -20,6 +20,7 @@ import { RequestsModule } from './requests/requests.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CitiesModule } from './cities/cities.module';
 import { WebSocketModule } from './websocket/websocket.module';
+import { GlossariesModule } from './glossaries/glossaries.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { WebSocketModule } from './websocket/websocket.module';
     SkillsModule,
     CategoriesModule,
     CitiesModule,
+    GlossariesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, jwtConfig, dbConfig],
