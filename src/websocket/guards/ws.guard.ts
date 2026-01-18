@@ -4,7 +4,7 @@ import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { JwtConfig } from 'src/config/types';
 import { TJwtPayload } from 'src/auth/types';
-import { IAuthenticatedSocket } from './types';
+import { IAuthenticatedSocket } from '../types';
 
 @Injectable()
 export class WsJwtGuard {

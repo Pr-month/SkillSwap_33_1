@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { NotificationsGateway } from './gateways/notifications/notifications.gateway';
-import { WsJwtGuard } from './ws.guard';
+import { WsJwtGuard } from './guards/ws.guard';
 
 @Module({
   providers: [NotificationsGateway, WsJwtGuard],

@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io';
-import { WsJwtGuard } from './ws.guard';
+import { WsJwtGuard } from './guards/ws.guard';
 import { Logger } from '@nestjs/common';
 
 export class BaseGateway {
