@@ -1,7 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiBody, ApiHeader, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginDto } from './dto/login.dto';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 export const ApiRefreshToken = () =>
   applyDecorators(
@@ -36,7 +36,7 @@ export const ApiLogin = () =>
 export const ApiRegister = () =>
   applyDecorators(
     ApiOperation({ summary: 'Регистрация нового пользователя' }),
-    ApiBody({ type: CreateAuthDto }),
+    ApiBody({ type: CreateUserDto }),
     ApiResponse({
       status: 201,
       description: 'Пользователь успешно зарегистрирован',

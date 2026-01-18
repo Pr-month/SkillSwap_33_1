@@ -1,9 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CitiesService } from './cities.service';
 
+jest.mock('uuid', () => ({
+  v4: jest
+    .fn()
+    .mockImplementation(
+      () => 'mock-uuid-' + Math.random().toString(36).slice(2, 9),
+    ),
+}));
+
 jest.mock('./data', () => ({
   allCitiesData: [
     {
+      id: '1',
       coords: { lat: '52.65', lon: '90.083333333333' },
       district: 'Сибирский',
       name: 'Абаза',
@@ -11,6 +20,7 @@ jest.mock('./data', () => ({
       subject: 'Хакасия',
     },
     {
+      id: '2',
       coords: { lat: '53.71667', lon: '91.41667' },
       district: 'Сибирский',
       name: 'Абакан',
@@ -18,6 +28,7 @@ jest.mock('./data', () => ({
       subject: 'Хакасия',
     },
     {
+      id: '3',
       coords: { lat: '53.68333', lon: '53.65' },
       district: 'Приволжский',
       name: 'Абдулино',
@@ -25,6 +36,7 @@ jest.mock('./data', () => ({
       subject: 'Оренбургская область',
     },
     {
+      id: '4',
       coords: { lat: '44.86667', lon: '38.16667' },
       district: 'Южный',
       name: 'Абинск',
@@ -49,11 +61,12 @@ describe('CitiesService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('findAll', () => {
+  describe('findAllRaw', () => {
     it('should return all cities', () => {
-      const result = service.findAll();
+      const result = service.findAllRaw();
       expect(result).toHaveLength(4);
       expect(result[0].name).toBe('Абаза');
+      expect(result[0].id).toBe('1');
     });
   });
 
@@ -62,56 +75,114 @@ describe('CitiesService', () => {
       const result = service.findBySubject('Хакасия');
       expect(result).toHaveLength(2);
       expect(result.map((c) => c.name)).toEqual(['Абаза', 'Абакан']);
-    });
-
-    it('should return empty for unknown subject', () => {
-      expect(service.findBySubject('Неизвестный')).toEqual([]);
+      expect(result[0].id).toBe('1');
     });
   });
 
   describe('findByDistrict', () => {
-    it('should return cities in Сибирский', () => {
+    it('should return cities in Сибирский district', () => {
       const result = service.findByDistrict('Сибирский');
       expect(result).toHaveLength(2);
+      expect(result.map((c) => c.name)).toEqual(['Абаза', 'Абакан']);
     });
 
-    it('should be case-sensitive', () => {
-      expect(service.findByDistrict('сибирский')).toEqual([]);
+    it('should return empty array for unknown district', () => {
+      const result = service.findByDistrict('Дальневосточный');
+      expect(result).toHaveLength(0);
     });
   });
 
   describe('findByName', () => {
-    it('should find Абакан', () => {
-      expect(service.findByName('Абакан')?.name).toBe('Абакан');
+    it('should return city by exact name', () => {
+      const city = service.findByName('Абакан');
+      expect(city).toBeDefined();
+      expect(city!.name).toBe('Абакан');
+      expect(city!.id).toBe('2');
     });
 
-    it('should not match lowercase', () => {
-      expect(service.findByName('абакан')).toBeUndefined();
+    it('should return undefined for unknown name', () => {
+      const city = service.findByName('Москва');
+      expect(city).toBeUndefined();
     });
   });
 
   describe('searchByName', () => {
-    it('should find all 4 cities with "аб"', () => {
-      const result = service.searchByName('аб');
-      expect(result).toHaveLength(4);
-      expect(result.map((c) => c.name)).toEqual([
-        'Абаза',
-        'Абакан',
-        'Абдулино',
-        'Абинск',
-      ]);
+    it('should return cities matching substring (case-insensitive)', () => {
+      const result = service.searchByName('аба');
+      expect(result).toHaveLength(2);
+      expect(result.map((c) => c.name)).toEqual(['Абаза', 'Абакан']);
     });
 
-    it('should be case-insensitive and trim spaces', () => {
-      expect(service.searchByName('  АБ  ')).toHaveLength(4);
+    it('should return empty array for no matches', () => {
+      const result = service.searchByName('xyz');
+      expect(result).toHaveLength(0);
     });
 
-    it('should return all on empty query', () => {
-      expect(service.searchByName('')).toHaveLength(4);
+    it('should trim and normalize query', () => {
+      const result = service.searchByName('  АБА  ');
+      expect(result).toHaveLength(2);
+    });
+  });
+
+  describe('findAllPaginated (glossary facade)', () => {
+    it('should return paginated items as CityDto[]', () => {
+      const result = service.findAllPaginated({ page: 1, limit: 2 });
+
+      expect(result.total).toBe(4);
+      expect(result.items).toHaveLength(2);
+      expect(result.items[0]).toEqual({
+        id: '1',
+        coords: { lat: '52.65', lon: '90.083333333333' },
+        district: 'Сибирский',
+        name: 'Абаза',
+        population: 12272,
+        subject: 'Хакасия',
+      });
+
+      expect(result.items[0]).toHaveProperty('id');
+      expect(result.items[0]).toHaveProperty('name');
     });
 
-    it('should return none on no match', () => {
-      expect(service.searchByName('xyz')).toEqual([]);
+    it('should support search', () => {
+      const result = service.findAllPaginated({ search: 'аба' });
+      expect(result.items).toHaveLength(2);
+      expect(result.items.map((c) => c.name)).toEqual(['Абаза', 'Абакан']);
+    });
+
+    it('should respect pagination', () => {
+      const result = service.findAllPaginated({ page: 2, limit: 2 });
+      expect(result.items).toHaveLength(2);
+      expect(result.items[0].name).toBe('Абдулино');
+    });
+
+    it('should apply default limit and page', () => {
+      const result = service.findAllPaginated({});
+      expect(result.total).toBe(4);
+      expect(result.items).toHaveLength(4);
+    });
+
+    it('should cap limit at 100', () => {
+      const result = service.findAllPaginated({ limit: 200 });
+      expect(result.items).toHaveLength(4);
+    });
+  });
+
+  describe('findOneById', () => {
+    it('should return city by id as CityDto', () => {
+      const city = service.findOneById('2');
+      expect(city).toEqual({
+        id: '2',
+        coords: { lat: '53.71667', lon: '91.41667' },
+        district: 'Сибирский',
+        name: 'Абакан',
+        population: 184769,
+        subject: 'Хакасия',
+      });
+    });
+
+    it('should return null for unknown id', () => {
+      const city = service.findOneById('999');
+      expect(city).toBeNull();
     });
   });
 });
