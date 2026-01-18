@@ -24,6 +24,8 @@ FROM base AS development
 ENV NODE_ENV=development
 COPY --from=deps-dev --chown=node:node /app/node_modules ./node_modules
 COPY . .
+COPY src/scripts ./scripts
+RUN chmod +x scripts/init-db.sh
 EXPOSE 3000
 CMD ["npm", "run", "start"]
 
