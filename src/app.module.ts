@@ -19,6 +19,7 @@ import { CsrfController } from './csrf/csrf.controller';
 import { RequestsModule } from './requests/requests.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CitiesModule } from './cities/cities.module';
+import { WebSocketModule } from './websocket/websocket.module';
 import { GlossariesModule } from './glossaries/glossaries.module';
 
 @Module({
@@ -52,6 +53,7 @@ import { GlossariesModule } from './glossaries/glossaries.module';
     }),
     FilesModule,
     RequestsModule,
+    WebSocketModule,
   ],
   controllers: [AppController, CsrfController],
   providers: [AppService],
