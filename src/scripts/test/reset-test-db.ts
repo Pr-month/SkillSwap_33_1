@@ -34,4 +34,4 @@ async function saveData<T extends User | Skill | Category>(
   return;
 }
 
-resetDatabase();
+resetDatabase().catch((err) => console.error(err));
