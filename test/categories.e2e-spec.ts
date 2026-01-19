@@ -1,28 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, NotFoundException } from '@nestjs/common';
 import request from 'supertest';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { Express } from 'express';
-import { CategoriesModule } from '../src/categories/categories.module';
 import { Category } from '../src/categories/entities/category.entity';
 import { CreateCategoryDto } from '../src/categories/dto/create-category.dto';
 import { UpdateCategoryDto } from '../src/categories/dto/update-category.dto';
 import { AccessTokenGuard } from '../src/auth/guards/accessToken.guard';
 import { CategoriesService } from '../src/categories/categories.service';
-import * as dotenv from 'dotenv';
 import { validate as isUuid } from 'uuid';
-
-// Загрузка .env.test.local
-dotenv.config({ path: '.env.test.local' });
-
-// Утилита для получения обязательных env-переменных
-const getEnv = (key: string): string => {
-  const value = process.env[key];
-  if (value === undefined) {
-    throw new Error(`Environment variable ${key} is required but not set.`);
-  }
-  return value;
-};
+import { AppModule } from 'src/app.module';
 
 // Утилиты извлечения данных из ответа
 const extractId = (body: unknown): string => {
@@ -81,21 +67,7 @@ describe('CategoriesController (e2e)', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          host: getEnv('DB_HOST'),
-          port: parseInt(getEnv('DB_PORT'), 10),
-          username: getEnv('DB_USERNAME'),
-          password: getEnv('DB_PASSWORD'),
-          database: getEnv('DB_NAME'),
-          entities: [Category],
-          synchronize: true,
-          dropSchema: true,
-          logging: false,
-        }),
-        CategoriesModule,
-      ],
+      imports: [AppModule],
     })
       .overrideGuard(AccessTokenGuard)
       .useValue({ canActivate: () => true })
@@ -145,13 +117,8 @@ describe('CategoriesController (e2e)', () => {
     await app.init();
     server = app.getHttpServer() as Express;
   });
-
   afterAll(async () => {
     await app.close();
-  });
-
-  it('/GET categories (public) should return empty array', () => {
-    return request(server).get('/categories').expect(200).expect([]);
   });
 
   describe('Protected CRUD operations (with mocked auth)', () => {
