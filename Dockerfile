@@ -7,7 +7,7 @@ WORKDIR /app
 
 FROM base AS deps-prod
 COPY package*.json package-lock.json* ./
-RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
+RUN npm ci --ignore-scripts && npm cache clean --force
 
 FROM base AS deps-dev
 COPY package*.json package-lock.json* ./
@@ -36,9 +36,9 @@ WORKDIR /app
 COPY --from=deps-prod --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
 COPY --from=build --chown=node:node /app/package*.json ./
+COPY src/scripts ./scripts
+RUN chmod +x scripts/init-db.sh
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD node healthcheck.js || exit 1
-ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "dist/main"]

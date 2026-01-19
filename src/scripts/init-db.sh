@@ -14,4 +14,4 @@ npm run build
 
 echo "✅ Приложение собрано, запускаем prod версию..."
 
-exec npm run start:prod
+exec npm run start
