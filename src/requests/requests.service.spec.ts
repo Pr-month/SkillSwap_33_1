@@ -9,6 +9,7 @@ import { RequestsService } from './requests.service';
 import { Request } from './entities/request.entity';
 import { Skill } from '../skills/entities/skill.entity';
 import { RequestStatus } from './requests.enum';
+import { NotificationsGateway } from '../websocket/gateways/notifications/notifications.gateway';
 
 describe('RequestsService', () => {
   let service: RequestsService;
@@ -25,6 +26,10 @@ describe('RequestsService', () => {
     findOne: jest.fn(),
   };
 
+  const mockNotificationGateway = {
+    sendNotification: jest.fn(),
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -37,6 +42,10 @@ describe('RequestsService', () => {
           provide: getRepositoryToken(Skill),
           useValue: mockSkillRepository,
         },
+        {
+          provide: NotificationsGateway,
+          useValue: mockNotificationGateway,
+        }
       ],
     }).compile();
 
@@ -74,6 +83,7 @@ describe('RequestsService', () => {
       mockSkillRepository.findOne.mockResolvedValue(mockSkill);
       mockRequestRepository.create.mockReturnValue(mockRequest);
       mockRequestRepository.save.mockResolvedValue(mockRequest);
+      mockNotificationGateway.sendNotification('Request is created');
 
       const result = await service.create(dto, senderId);
 
@@ -81,6 +91,7 @@ describe('RequestsService', () => {
       expect(mockSkillRepository.findOne).toHaveBeenCalled();
       expect(mockRequestRepository.create).toHaveBeenCalled();
       expect(mockRequestRepository.save).toHaveBeenCalled();
+      expect(mockNotificationGateway.sendNotification).toHaveBeenCalled();
     });
 
     it('должен выбросить NotFoundException если навык не найден', async () => {
@@ -159,6 +170,7 @@ describe('RequestsService', () => {
     it('должен успешно обновить статус заявки', async () => {
       const mockRequest = {
         id: requestId,
+        sender: {id: userId },
         receiver: { id: userId },
         status: RequestStatus.PENDING,
         isRead: false,

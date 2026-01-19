@@ -11,8 +11,8 @@ import { Skill } from '../skills/entities/skill.entity';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { RequestStatus } from './requests.enum';
-import { NotificationsGateway } from 'src/websocket/gateways/notifications/notifications.gateway';
-import { NotificationTypes } from 'src/websocket/gateways/notifications/types';
+import { NotificationsGateway } from '../websocket/gateways/notifications/notifications.gateway';
+import { NotificationTypes } from '../websocket/gateways/notifications/types';
 
 @Injectable()
 export class RequestsService {

@@ -3,7 +3,7 @@ import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Namespace } from 'socket.io';
 import { BaseGateway } from '../../base.gateway';
 import { NotificationPayload } from './types';
-import { WsJwtGuard } from 'src/websocket/guards/ws.guard';
+import { WsJwtGuard } from '../../guards/ws.guard';
 
 @WebSocketGateway({ namespace: '/notifications' })
 export class NotificationsGateway extends BaseGateway {

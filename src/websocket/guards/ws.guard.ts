@@ -1,10 +1,10 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { jwtConfig as jwtCnf } from 'src/config/jwt.config';
+import { jwtConfig as jwtCnf } from '../../config/jwt.config';
 import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
-import { JwtConfig } from 'src/config/types';
-import { TJwtPayload } from 'src/auth/types';
+import { TJwtPayload } from '../../auth/types';
 import { IAuthenticatedSocket } from '../types';
+import { JwtConfig } from '../../config/types';
 
 @Injectable()
 export class WsJwtGuard {
