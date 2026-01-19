@@ -95,7 +95,11 @@ describe('GlossariesService', () => {
 
   describe('getItems', () => {
     it('should return items for existing glossary', async () => {
-      const result = await service.getItems('mock', 1, 5, 'test');
+      const result = await service.getItems('mock', {
+        page: 1,
+        limit: 5,
+        search: 'test',
+      });
       expect(result).toEqual({
         items: [{ id: '1', name: 'Test' }],
         total: 1,

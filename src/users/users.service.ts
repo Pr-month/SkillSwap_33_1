@@ -26,7 +26,7 @@ export class UsersService {
       email: user.email,
       about: user.about,
       birthdate: user.birthdate,
-      city: user.city,
+      city: user.city.name,
       gender: user.gender,
       avatar: user.avatar,
       role: user.role,
