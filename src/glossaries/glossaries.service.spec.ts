@@ -107,9 +107,9 @@ describe('GlossariesService', () => {
     });
 
     it('should throw error for non-existent glossary', async () => {
-      await expect(service.getItems('unknown')).rejects.toThrow(
-        "Glossary 'unknown' not found",
-      );
+      await expect(
+        service.getItems('unknown', { page: 0, limit: 0, search: '' }),
+      ).rejects.toThrow("Glossary 'unknown' not found");
     });
   });
 

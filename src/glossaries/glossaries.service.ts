@@ -1,4 +1,9 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import {
   IGlossaryProvider,
   SearchParams,
@@ -55,7 +60,12 @@ export class GlossariesService {
     };
   }
 
-  getItems(code: string, params?: SearchParams) {
+  getItems(code: string, params: SearchParams) {
+    if (params.page < 0 || params.limit < 0)
+      throw new BadRequestException(
+        'Номер страницы или лимит элементов не могут быть меньше 0',
+      );
+
     const provider = this.getGlossary(code);
 
     if (!provider) throw new NotFoundException(`Glossary '${code}' not found`);
