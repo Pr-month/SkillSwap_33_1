@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserRole } from '../auth/roles.enum';
 import { TAuthResponse } from '../auth/types';
@@ -87,7 +86,7 @@ describe('SkillsController', () => {
         images: [],
       };
       await controller.create(authRequest, dto);
-      expect(skillsService.create).toHaveBeenCalledWith(
+      expect(skillsService['create']).toHaveBeenCalledWith(
         authRequest.user.sub,
         dto,
       );
@@ -107,7 +106,7 @@ describe('SkillsController', () => {
 
       const result = await controller.findAll(query);
 
-      expect(skillsService.findAll).toHaveBeenCalledWith(query);
+      expect(skillsService['findAll']).toHaveBeenCalledWith(query);
       expect(result).toEqual(mockResult);
       expect(result.data).toHaveLength(1);
     });
@@ -128,7 +127,7 @@ describe('SkillsController', () => {
 
       await controller.findAll(query);
 
-      expect(skillsService.findAll).toHaveBeenCalledWith(query);
+      expect(skillsService['findAll']).toHaveBeenCalledWith(query);
     });
 
     it('должен обрабатывать фильтр по категориям', async () => {
@@ -147,7 +146,7 @@ describe('SkillsController', () => {
 
       await controller.findAll(query);
 
-      expect(skillsService.findAll).toHaveBeenCalledWith(query);
+      expect(skillsService['findAll']).toHaveBeenCalledWith(query);
     });
 
     it('должен обрабатывать пустой результат', async () => {
@@ -162,7 +161,7 @@ describe('SkillsController', () => {
 
       const result = await controller.findAll(query);
 
-      expect(skillsService.findAll).toHaveBeenCalledWith(query);
+      expect(skillsService['findAll']).toHaveBeenCalledWith(query);
       expect(result.data).toHaveLength(0);
     });
   });
@@ -173,7 +172,7 @@ describe('SkillsController', () => {
 
       const result = await controller.findOne('skill-id-1');
 
-      expect(skillsService.findOne).toHaveBeenCalledWith('skill-id-1');
+      expect(skillsService['findOne']).toHaveBeenCalledWith('skill-id-1');
       expect(result).toEqual(mockSkill);
       expect(result.id).toBe('skill-id-1');
       expect(result.title).toBe('React Development');
@@ -187,7 +186,7 @@ describe('SkillsController', () => {
       await expect(controller.findOne('non-existent-id')).rejects.toThrow(
         NotFoundException,
       );
-      expect(skillsService.findOne).toHaveBeenCalledWith('non-existent-id');
+      expect(skillsService['findOne']).toHaveBeenCalledWith('non-existent-id');
     });
 
     it('должен включать информацию о категории и владельце', async () => {
@@ -209,7 +208,7 @@ describe('SkillsController', () => {
 
       const result = await controller.addToFavorite('skill-id-1', authRequest);
 
-      expect(skillsService.addToFavorite).toHaveBeenCalledWith(
+      expect(skillsService['addToFavorite']).toHaveBeenCalledWith(
         authRequest.user.sub,
         'skill-id-1',
       );
@@ -247,7 +246,7 @@ describe('SkillsController', () => {
         authRequest,
       );
 
-      expect(skillsService.removeFromFavorite).toHaveBeenCalledWith(
+      expect(skillsService['removeFromFavorite']).toHaveBeenCalledWith(
         authRequest.user.sub,
         'skill-id-1',
       );
@@ -275,7 +274,7 @@ describe('SkillsController', () => {
         images: [],
       };
       await controller.update(skillId, authRequest, dto);
-      expect(skillsService.update).toHaveBeenCalledWith(
+      expect(skillsService['update']).toHaveBeenCalledWith(
         authRequest.user.sub,
         skillId,
         dto,
@@ -287,7 +286,7 @@ describe('SkillsController', () => {
     it('должен вызывать service.remove с ID навыка', async () => {
       const skillId = 'test-skill-id';
       await controller.remove(skillId, authRequest);
-      expect(skillsService.remove).toHaveBeenCalledWith(
+      expect(skillsService['remove']).toHaveBeenCalledWith(
         authRequest.user.sub,
         skillId,
       );
