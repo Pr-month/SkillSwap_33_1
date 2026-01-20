@@ -18,4 +18,8 @@ export const envValidationSchema = Joi.object({
   JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
 
   HASH_SALT: Joi.number().default(10),
+
+  CSRF_SECRET: Joi.string()
+    .min(32)
+    .default('super-secret-key-at-least-32-chars'),
 });

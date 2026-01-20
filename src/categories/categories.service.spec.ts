@@ -2,6 +2,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, DeleteResult } from 'typeorm';
+import { NotFoundException } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { Category } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -90,7 +91,7 @@ describe('CategoriesService', () => {
       expect(result.parent).toEqual(parent);
     });
 
-    it('should throw "Parent category not found" if parentId is invalid', async () => {
+    it('should throw NotFoundException if parentId is invalid', async () => {
       const dto: CreateCategoryDto = {
         name: 'Phones',
         parentId: 'non-existent',
@@ -100,8 +101,8 @@ describe('CategoriesService', () => {
       repository.create.mockReturnValue(newCategory);
       repository.findOneBy.mockResolvedValue(null);
 
-      await expect(service.create(dto)).rejects.toThrow(
-        'Parent category not found',
+      await expect(service.create(dto)).rejects.toBeInstanceOf(
+        NotFoundException,
       );
       expect(repository.save).not.toHaveBeenCalled();
     });
@@ -153,11 +154,11 @@ describe('CategoriesService', () => {
       expect(result).toEqual(category);
     });
 
-    it('should throw "Category not found" if not exists', async () => {
+    it('should throw NotFoundException if not exists', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('invalid-id')).rejects.toThrow(
-        'Category not found',
+      await expect(service.findOne('invalid-id')).rejects.toBeInstanceOf(
+        NotFoundException,
       );
     });
   });
@@ -213,15 +214,15 @@ describe('CategoriesService', () => {
       expect(result.parent).toEqual(newParent);
     });
 
-    it('should throw "Parent category not found" on invalid parentId in update', async () => {
+    it('should throw NotFoundException on invalid parentId in update', async () => {
       const existing = createMockCategory('cat-1', 'Child');
       const dto: UpdateCategoryDto = { parentId: 'invalid' };
 
       repository.findOne.mockResolvedValue(existing);
       repository.findOneBy.mockResolvedValue(null);
 
-      await expect(service.update('cat-1', dto)).rejects.toThrow(
-        'Parent category not found',
+      await expect(service.update('cat-1', dto)).rejects.toBeInstanceOf(
+        NotFoundException,
       );
       expect(repository.save).not.toHaveBeenCalled();
     });

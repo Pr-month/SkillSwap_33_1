@@ -69,11 +69,14 @@ export class AuthService {
   }
 
   async register(dto: CreateUserDto) {
-    const hash = await bcrypt.hash(dto.password, 10);
     await this.usersService.create({
-      ...dto,
-      password: hash,
+      email: dto.email,
+      password: dto.password,
     });
     return this.login(dto);
+  }
+
+  logout(userId: string) {
+    return this.usersService.refresh(userId, null);
   }
 }

@@ -43,6 +43,11 @@ export class AllExceptionFilter implements ExceptionFilter {
         status = HttpStatus.BAD_REQUEST;
         message = exception.message;
       }
+    } else if (this.isCsrfError(exception)) {
+      status = HttpStatus.FORBIDDEN;
+      message = 'Invalid CSRF token';
+    } else {
+      console.error(exception);
     }
 
     response.status(status).json({
@@ -51,5 +56,14 @@ export class AllExceptionFilter implements ExceptionFilter {
       path: request.url,
       timestamp: new Date().toISOString(),
     });
+  }
+
+  private isCsrfError(exception: unknown): boolean {
+    return (
+      typeof exception === 'object' &&
+      exception !== null &&
+      'code' in exception &&
+      exception.code === 'EBADCSRFTOKEN'
+    );
   }
 }
