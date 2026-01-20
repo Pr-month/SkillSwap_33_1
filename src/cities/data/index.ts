@@ -1,11 +1,14 @@
-import russia from './cities-russia.json';
 import { City } from '../interfaces/city.interface';
+import { v4 as uuidv4 } from 'uuid';
+import rawCities from './cities-russia.json';
 
-export const allCitiesData = Object.freeze(russia as readonly City[]);
+if (!Array.isArray(rawCities)) {
+  throw new Error('cities-russia.json must export a JSON array');
+}
 
-/*
-export const allCitiesData = Object.freeze([
-  ...russia,
-  // ...belarus,
-] as readonly City[]);
-*/
+const enrichedRussia: City[] = rawCities.map((city) => ({
+  ...city,
+  id: uuidv4(),
+}));
+
+export const allCitiesData = Object.freeze(enrichedRussia);

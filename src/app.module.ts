@@ -19,6 +19,8 @@ import { CsrfController } from './csrf/csrf.controller';
 import { RequestsModule } from './requests/requests.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CitiesModule } from './cities/cities.module';
+import { WebSocketModule } from './websocket/websocket.module';
+import { GlossariesModule } from './glossaries/glossaries.module';
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { CitiesModule } from './cities/cities.module';
     SkillsModule,
     CategoriesModule,
     CitiesModule,
+    GlossariesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, jwtConfig, dbConfig],
@@ -50,6 +53,7 @@ import { CitiesModule } from './cities/cities.module';
     }),
     FilesModule,
     RequestsModule,
+    WebSocketModule,
   ],
   controllers: [AppController, CsrfController],
   providers: [AppService],

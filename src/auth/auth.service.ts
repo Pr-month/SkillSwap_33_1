@@ -70,7 +70,8 @@ export class AuthService {
 
   async register(dto: CreateUserDto) {
     await this.usersService.create({
-      ...dto,
+      email: dto.email,
+      password: dto.password,
     });
     return this.login(dto);
   }

@@ -12,6 +12,10 @@ class CoordsDto {
 }
 
 export class CityDto {
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
+  @IsString()
+  id: string;
+
   @ApiProperty({ type: CoordsDto })
   @IsObject()
   coords: CoordsDto;

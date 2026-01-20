@@ -4,6 +4,7 @@ export interface CityCoords {
 }
 
 export interface City {
+  id: string;
   coords: CityCoords;
   district: string;
   name: string;
