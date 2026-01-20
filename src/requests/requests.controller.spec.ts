@@ -4,6 +4,7 @@ import { RequestsController } from './requests.controller';
 import { RequestsService } from './requests.service';
 import { Request } from './entities/request.entity';
 import { Skill } from '../skills/entities/skill.entity';
+import { NotificationsGateway } from '../websocket/gateways/notifications/notifications.gateway';
 
 describe('RequestsController', () => {
   let controller: RequestsController;
@@ -20,6 +21,10 @@ describe('RequestsController', () => {
     findOne: jest.fn(),
   };
 
+  const mockNotificationGateway = {
+    sendNotification: jest.fn(),
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RequestsController],
@@ -32,6 +37,10 @@ describe('RequestsController', () => {
         {
           provide: getRepositoryToken(Skill),
           useValue: mockSkillRepository,
+        },
+        {
+          provide: NotificationsGateway,
+          useValue: mockNotificationGateway,
         },
       ],
     }).compile();

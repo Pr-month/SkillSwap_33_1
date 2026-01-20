@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      target: development
+    ports:
+      - '3000:3000'
+    env_file: .env
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/skillswap?schema=public
+    command: scripts/init-db.sh
+
+volumes:
+  postgres_data:
