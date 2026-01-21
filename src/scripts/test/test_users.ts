@@ -2,9 +2,9 @@ import { UserRole } from '../../auth/roles.enum';
 import { User } from '../../users/entities/user.entity';
 import { Gender } from '../../users/users.enums';
 import * as bcrypt from 'bcrypt';
-import skills from './test_skills';
+import { cities } from './test_cities';
 
-const users: User[] = [
+export const users: User[] = [
   {
     id: '123e4567-e89b-12d3-a456-426614174001',
     name: 'Александр Иванов',
@@ -12,7 +12,7 @@ const users: User[] = [
     password: bcrypt.hashSync('12345', parseInt(process.env.HASH_SALT || '10')),
     about: 'Фронтенд разработчик с 5-летним опытом. Люблю React и TypeScript.',
     birthdate: new Date('1990-05-15'),
-    city: 'Москва',
+    city: cities[0],
     gender: Gender.MALE,
     avatar: 'https://example.com/avatars/alex.jpg',
     skills: [],
@@ -27,7 +27,7 @@ const users: User[] = [
     password: bcrypt.hashSync('1111', parseInt(process.env.HASH_SALT || '10')),
     about: 'UI/UX дизайнер. Создаю удобные и красивые интерфейсы.',
     birthdate: new Date('1993-08-22'),
-    city: 'Санкт-Петербург',
+    city: cities[1],
     gender: Gender.FEMALE,
     avatar: 'https://example.com/avatars/maria.jpg',
     skills: [],
@@ -45,7 +45,7 @@ const users: User[] = [
     ),
     about: 'Преподаватель английского языка. Опыт работы - 7 лет.',
     birthdate: new Date('1988-11-30'),
-    city: 'Казань',
+    city: cities[3],
     gender: Gender.MALE,
     avatar: '',
     skills: [],
@@ -63,7 +63,7 @@ const users: User[] = [
     ),
     about: '',
     birthdate: new Date('1988-11-30'),
-    city: 'Екатеринбург',
+    city: cities[2],
     gender: Gender.FEMALE,
     avatar: 'https://example.com/avatars/elena.jpg',
     skills: [],
@@ -72,74 +72,3 @@ const users: User[] = [
     favoriteSkills: [],
   },
 ];
-
-const usersWithSkills: User[] = [
-  {
-    id: '123e4567-e89b-12d3-a456-426614174001',
-    name: 'Александр Иванов',
-    email: 'alex.ivanov@example.com',
-    password: bcrypt.hashSync('12345', parseInt(process.env.HASH_SALT || '10')),
-    about: 'Фронтенд разработчик с 5-летним опытом. Люблю React и TypeScript.',
-    birthdate: new Date('1990-05-15'),
-    city: 'Москва',
-    gender: Gender.MALE,
-    avatar: 'https://example.com/avatars/alex.jpg',
-    skills: [skills[0], skills[3]],
-    role: UserRole.USER,
-    refreshToken: null,
-    favoriteSkills: [skills[1]],
-  },
-  {
-    id: '123e4567-e89b-12d3-a456-426614174002',
-    name: 'Мария Петрова',
-    email: 'maria.petrova@example.com',
-    password: bcrypt.hashSync('1111', parseInt(process.env.HASH_SALT || '10')),
-    about: 'UI/UX дизайнер. Создаю удобные и красивые интерфейсы.',
-    birthdate: new Date('1993-08-22'),
-    city: 'Санкт-Петербург',
-    gender: Gender.FEMALE,
-    avatar: 'https://example.com/avatars/maria.jpg',
-    skills: [skills[1]],
-    role: UserRole.USER,
-    refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    favoriteSkills: [skills[3]],
-  },
-  {
-    id: '123e4567-e89b-12d3-a456-426614174003',
-    name: 'Иван Сидоров',
-    email: 'ivan.sidorov@example.com',
-    password: bcrypt.hashSync(
-      'strong_password',
-      parseInt(process.env.HASH_SALT || '10'),
-    ),
-    about: 'Преподаватель английского языка. Опыт работы - 7 лет.',
-    birthdate: new Date('1988-11-30'),
-    city: 'Казань',
-    gender: Gender.MALE,
-    avatar: '',
-    skills: [skills[2]],
-    role: UserRole.ADMIN,
-    refreshToken: null,
-    favoriteSkills: [skills[4]],
-  },
-  {
-    id: '123e4567-e89b-12d3-a456-426614174004',
-    name: 'Елена Козлова',
-    email: 'elena.kozlova@example.com',
-    password: bcrypt.hashSync(
-      'awesome_password',
-      parseInt(process.env.HASH_SALT || '10'),
-    ),
-    about: '',
-    birthdate: new Date('1988-11-30'),
-    city: 'Екатеринбург',
-    gender: Gender.FEMALE,
-    avatar: 'https://example.com/avatars/elena.jpg',
-    skills: [skills[4]],
-    role: UserRole.USER,
-    refreshToken: null,
-    favoriteSkills: [skills[2]],
-  },
-];
-
-export { users, usersWithSkills };

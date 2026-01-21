@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GlossariesService } from './glossaries.service';
 import { IGlossaryProvider } from './interfaces/glossary-provider.interface';
+import { NotFoundException } from '@nestjs/common';
 
 class MockProvider implements IGlossaryProvider {
   code = 'mock';
@@ -95,17 +96,21 @@ describe('GlossariesService', () => {
 
   describe('getItems', () => {
     it('should return items for existing glossary', async () => {
-      const result = await service.getItems('mock', 1, 5, 'test');
+      const result = await service.getItems('mock', {
+        page: 1,
+        limit: 5,
+        search: 'test',
+      });
       expect(result).toEqual({
         items: [{ id: '1', name: 'Test' }],
         total: 1,
       });
     });
 
-    it('should throw error for non-existent glossary', async () => {
-      await expect(service.getItems('unknown')).rejects.toThrow(
-        "Glossary 'unknown' not found",
-      );
+    it('should throw error if glossary not found', async () => {
+      await expect(
+        service.getItems('unknown', { page: 0, limit: 0, search: '' }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -117,7 +122,7 @@ describe('GlossariesService', () => {
 
     it('should throw error if glossary not found', async () => {
       await expect(service.getItem('unknown', '1')).rejects.toThrow(
-        "Glossary 'unknown' not found",
+        NotFoundException,
       );
     });
   });
