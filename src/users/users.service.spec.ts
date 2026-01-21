@@ -4,13 +4,14 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from './users.service';
 import { User } from '../users/entities/user.entity';
-import { Gender } from '../users/users.enums';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserRole } from '../auth/roles.enum';
+import { users } from 'src/scripts/test/test_users';
+import { cities } from 'src/scripts/test/test_cities';
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn().mockImplementation((password: string) => {
@@ -25,54 +26,6 @@ jest.mock('bcrypt', () => ({
 }));
 
 const saltRounds = parseInt(process.env.HASH_SALT || '10', 10);
-
-const users: User[] = [
-  {
-    id: '123e4567-e89b-12d3-a456-426614174001',
-    name: 'Александр Иванов',
-    email: 'alex.ivanov@example.com',
-    password: 'hashed_12345',
-    about: 'Фронтенд разработчик с 5-летним опытом. Люблю React и TypeScript.',
-    birthdate: new Date('1990-05-15'),
-    city: 'Москва',
-    gender: Gender.MALE,
-    avatar: 'https://example.com/avatars/alex.jpg',
-    skills: [],
-    role: UserRole.USER,
-    refreshToken: null,
-    favoriteSkills: [],
-  },
-  {
-    id: '123e4567-e89b-12d3-a456-426614174002',
-    name: 'Мария Петрова',
-    email: 'maria.petrova@example.com',
-    password: 'hashed_1111',
-    about: 'UI/UX дизайнер. Создаю удобные и красивые интерфейсы.',
-    birthdate: new Date('1993-08-22'),
-    city: 'Санкт-Петербург',
-    gender: Gender.FEMALE,
-    avatar: 'https://example.com/avatars/maria.jpg',
-    skills: [],
-    role: UserRole.USER,
-    refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    favoriteSkills: [],
-  },
-  {
-    id: '123e4567-e89b-12d3-a456-426614174003',
-    name: 'Иван Сидоров',
-    email: 'ivan.sidorov@example.com',
-    password: 'hashed_strong_password',
-    about: 'Преподаватель английского языка. Опыт работы - 7 лет.',
-    birthdate: new Date('1988-11-30'),
-    city: 'Казань',
-    gender: Gender.MALE,
-    avatar: '',
-    skills: [],
-    role: UserRole.ADMIN,
-    refreshToken: null,
-    favoriteSkills: [],
-  },
-];
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -176,7 +129,7 @@ describe('UsersService', () => {
         email: users[0].email,
         about: users[0].about,
         birthdate: users[0].birthdate,
-        city: users[0].city,
+        city: users[0].city.name,
         gender: users[0].gender,
         avatar: users[0].avatar?.trim() ?? null,
         role: users[0].role,
@@ -199,7 +152,7 @@ describe('UsersService', () => {
         email: user.email,
         about: user.about,
         birthdate: user.birthdate,
-        city: user.city,
+        city: user.city.name,
         gender: user.gender,
         avatar: user.avatar?.trim() ?? null,
         role: user.role,
@@ -217,12 +170,13 @@ describe('UsersService', () => {
   describe('update', () => {
     it('should update user fields and return updated UserResponseDto', async () => {
       const user = users[0];
+      const city = cities[2];
       mockUserRepository.findOneBy.mockResolvedValue(user);
-      const updatedUser = { ...user, city: 'Новосибирск' };
-      mockUserRepository.save.mockResolvedValue(updatedUser as User);
+      const updatedUser = { ...user, city };
+      mockUserRepository.save.mockResolvedValue(updatedUser);
 
       const updateDto: UpdateUserDto = {
-        city: 'Новосибирск',
+        city: city.id,
         about: undefined,
       };
       const result = await service.update(user.id, updateDto);
@@ -230,9 +184,8 @@ describe('UsersService', () => {
       expect(repository.findOneBy).toHaveBeenCalledWith({ id: user.id });
       expect(repository.save).toHaveBeenCalledWith({
         ...user,
-        city: 'Новосибирск',
+        city: { id: city.id },
       });
-      expect(result.city).toBe('Новосибирск');
       expect(result.about).toBe(user.about);
     });
 

@@ -1,5 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CitiesService } from './cities.service';
+import { City } from './entities/city.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 jest.mock('uuid', () => ({
   v4: jest
@@ -9,52 +11,32 @@ jest.mock('uuid', () => ({
     ),
 }));
 
-jest.mock('./data', () => ({
-  allCitiesData: [
-    {
-      id: '1',
-      coords: { lat: '52.65', lon: '90.083333333333' },
-      district: 'Сибирский',
-      name: 'Абаза',
-      population: 12272,
-      subject: 'Хакасия',
-    },
-    {
-      id: '2',
-      coords: { lat: '53.71667', lon: '91.41667' },
-      district: 'Сибирский',
-      name: 'Абакан',
-      population: 184769,
-      subject: 'Хакасия',
-    },
-    {
-      id: '3',
-      coords: { lat: '53.68333', lon: '53.65' },
-      district: 'Приволжский',
-      name: 'Абдулино',
-      population: 17274,
-      subject: 'Оренбургская область',
-    },
-    {
-      id: '4',
-      coords: { lat: '44.86667', lon: '38.16667' },
-      district: 'Южный',
-      name: 'Абинск',
-      population: 39511,
-      subject: 'Краснодарский край',
-    },
-  ] as const,
-}));
-
 describe('CitiesService', () => {
   let service: CitiesService;
+  //let repository: Repository<City>;
+
+  const mockCityRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+    delete: jest.fn(),
+    find: jest.fn(),
+    findOneBy: jest.fn(),
+    update: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [CitiesService],
+      providers: [
+        CitiesService,
+        {
+          provide: getRepositoryToken(City),
+          useValue: mockCityRepository,
+        },
+      ],
     }).compile();
 
     service = module.get<CitiesService>(CitiesService);
+    //repository = module.get<Repository<City>>(getRepositoryToken(City));
   });
 
   it('should be defined', () => {

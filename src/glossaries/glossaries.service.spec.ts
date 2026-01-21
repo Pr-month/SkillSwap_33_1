@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GlossariesService } from './glossaries.service';
 import { IGlossaryProvider } from './interfaces/glossary-provider.interface';
+import { NotFoundException } from '@nestjs/common';
 
 class MockProvider implements IGlossaryProvider {
   code = 'mock';
@@ -106,10 +107,10 @@ describe('GlossariesService', () => {
       });
     });
 
-    it('should throw error for non-existent glossary', async () => {
+    it('should throw error if glossary not found', async () => {
       await expect(
         service.getItems('unknown', { page: 0, limit: 0, search: '' }),
-      ).rejects.toThrow("Glossary 'unknown' not found");
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -121,7 +122,7 @@ describe('GlossariesService', () => {
 
     it('should throw error if glossary not found', async () => {
       await expect(service.getItem('unknown', '1')).rejects.toThrow(
-        "Glossary 'unknown' not found",
+        NotFoundException,
       );
     });
   });

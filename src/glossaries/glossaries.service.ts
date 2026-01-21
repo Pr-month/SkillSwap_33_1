@@ -60,7 +60,7 @@ export class GlossariesService {
     };
   }
 
-  getItems(code: string, params: SearchParams) {
+  async getItems(code: string, params: SearchParams) {
     if (params.page < 0 || params.limit < 0)
       throw new BadRequestException(
         'Номер страницы или лимит элементов не могут быть меньше 0',
@@ -75,7 +75,7 @@ export class GlossariesService {
 
   async getItem(code: string, id: string): Promise<unknown> {
     const provider = this.getGlossary(code);
-    if (!provider) throw new Error(`Glossary '${code}' not found`);
+    if (!provider) throw new NotFoundException(`Glossary '${code}' not found`);
     return provider.findOne(id);
   }
 }
