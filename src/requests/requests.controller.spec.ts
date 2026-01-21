@@ -23,7 +23,7 @@ describe('RequestsController', () => {
 
   const mockNotificationGateway = {
     sendNotification: jest.fn(),
-  }
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
