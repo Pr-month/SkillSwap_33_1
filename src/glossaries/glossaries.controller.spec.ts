@@ -94,12 +94,11 @@ describe('GlossariesController', () => {
           totalPages: 3, // Math.ceil(25 / 10) = 3
         },
       });
-      expect(mockGlossaryService.getItems).toHaveBeenCalledWith(
-        'foo',
-        2,
-        10,
-        'test',
-      );
+      expect(mockGlossaryService.getItems).toHaveBeenCalledWith('foo', {
+        page: 2,
+        limit: 10,
+        search: 'test',
+      });
     });
 
     it('should handle default page and limit', async () => {
@@ -115,12 +114,11 @@ describe('GlossariesController', () => {
 
       expect(result.meta.page).toBe(1);
       expect(result.meta.limit).toBe(10);
-      expect(mockGlossaryService.getItems).toHaveBeenCalledWith(
-        'foo',
-        1,
-        10,
-        '',
-      );
+      expect(mockGlossaryService.getItems).toHaveBeenCalledWith('foo', {
+        page: 1,
+        limit: 10,
+        search: '',
+      });
     });
   });
 

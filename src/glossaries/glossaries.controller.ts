@@ -37,16 +37,15 @@ export class GlossariesController {
   @ApiGetGlossaryItems()
   async findItems(
     @Param('code') code: string,
-    @Query('page', ParseIntPipe) page = 1,
-    @Query('limit', ParseIntPipe) limit = 10,
+    @Query('page', new ParseIntPipe({ optional: true })) page = 1,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit = 10,
     @Query('search') search = '',
   ) {
-    const { items, total } = await this.glossariesService.getItems(
-      code,
+    const { items, total } = await this.glossariesService.getItems(code, {
       page,
       limit,
       search,
-    );
+    });
 
     return {
       items,

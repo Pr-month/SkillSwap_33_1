@@ -5,54 +5,64 @@ export type CategoryLike = Omit<Category, 'parent' | 'children'> & {
   children: Pick<Category, 'id'>[];
 };
 
+const ids = [
+  '550e8400-e29b-41d4-a716-446655440001',
+  '550e8400-e29b-41d4-a716-446655440004',
+  '550e8400-e29b-41d4-a716-446655440005',
+  '550e8400-e29b-41d4-a716-446655440002',
+  '550e8400-e29b-41d4-a716-446655440006',
+  '550e8400-e29b-41d4-a716-446655440003',
+  '550e8400-e29b-41d4-a716-446655440007',
+];
+
 const categories: CategoryLike[] = [
   {
-    id: '550e8400-e29b-41d4-a716-446655440001',
+    id: ids[0],
     name: 'Программирование',
     parent: null,
     children: [
       {
-        id: '550e8400-e29b-41d4-a716-446655440004',
+        id: ids[1],
       },
       {
-        id: '550e8400-e29b-41d4-a716-446655440005',
+        id: ids[2],
       },
     ],
   },
   {
-    id: '550e8400-e29b-41d4-a716-446655440004',
+    id: ids[1],
     name: 'Веб-разработка',
-    parent: { id: '550e8400-e29b-41d4-a716-446655440001' },
+    parent: { id: ids[0] },
     children: [],
   },
   {
-    id: '550e8400-e29b-41d4-a716-446655440005',
+    id: ids[2],
     name: 'Мобильная разработка',
-    parent: { id: '550e8400-e29b-41d4-a716-446655440001' },
+    parent: { id: ids[0] },
     children: [],
   },
   {
-    id: '550e8400-e29b-41d4-a716-446655440002',
+    id: ids[3],
     name: 'Дизайн',
     parent: null,
-    children: [{ id: '550e8400-e29b-41d4-a716-446655440006' }],
+    children: [{ id: ids[4] }],
   },
   {
-    id: '550e8400-e29b-41d4-a716-446655440006',
+    id: ids[4],
     name: 'UI/UX дизайн',
-    parent: { id: '550e8400-e29b-41d4-a716-446655440002' },
+    parent: { id: ids[3] },
     children: [],
   },
   {
-    id: '550e8400-e29b-41d4-a716-446655440003',
+    id: ids[5],
     name: 'Языки',
     parent: null,
-    children: [{ id: '550e8400-e29b-41d4-a716-446655440003' }],
+    children: [{ id: ids[6] }],
   },
   {
-    id: '550e8400-e29b-41d4-a716-446655440007',
+    id: ids[6],
     name: 'Английский язык',
-    parent: { id: '550e8400-e29b-41d4-a716-446655440003' },
+    parent: { id: ids[5] },
     children: [],
   },
 ];
