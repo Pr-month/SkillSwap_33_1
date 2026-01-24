@@ -28,7 +28,7 @@ describe('RequestsService', () => {
 
   const mockNotificationGateway = {
     sendNotification: jest.fn(),
-  }
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -45,7 +45,7 @@ describe('RequestsService', () => {
         {
           provide: NotificationsGateway,
           useValue: mockNotificationGateway,
-        }
+        },
       ],
     }).compile();
 
@@ -170,7 +170,7 @@ describe('RequestsService', () => {
     it('должен успешно обновить статус заявки', async () => {
       const mockRequest = {
         id: requestId,
-        sender: {id: userId },
+        sender: { id: userId },
         receiver: { id: userId },
         status: RequestStatus.PENDING,
         isRead: false,

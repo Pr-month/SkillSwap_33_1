@@ -19,5 +19,12 @@
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-  }
+    "types": ["jest", "node"],
+  },
+  "include": ["src/**/*", "test/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "../frontend/**/*",
+    "dist"
+  ]
 }
