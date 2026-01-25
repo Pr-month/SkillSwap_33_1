@@ -20,11 +20,11 @@
  * TODO [AuthService.logout]:
  * Убедиться, что refresh-токен действительно обнуляется в БД.
  * (Предполагается, что это уже делается, но без проверки в стратегии — бесполезно.)
-       
- * TODO [AuthService / UsersService]:
- * Обрабатывать ошибку уникальности email как ConflictException (HTTP 409).
- * Сейчас: QueryFailedError → 500 Internal Server Error.
- * Нужно: перехватывать QueryFailedError с кодом '23505' и бросать ConflictException.
+ * 
+    RolandSallaz
+    3 days ago
+    Это лучше в стратегии
+
 */
 
 import { Test, TestingModule } from '@nestjs/testing';
@@ -35,6 +35,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Express } from 'express';
+import { AllExceptionFilter } from 'src/common/all-exception.filter';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
@@ -52,6 +53,7 @@ describe('AuthController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalFilters(new AllExceptionFilter());
     server = app.getHttpServer() as Express;
     userRepository = moduleFixture.get<Repository<User>>(
       getRepositoryToken(User),
@@ -83,14 +85,7 @@ describe('AuthController (e2e)', () => {
     it('should not allow duplicate registration', async () => {
       await request(server).post('/auth/register').send(testUser).expect(201);
 
-      await request(server).post('/auth/register').send(testUser).expect(500);
-
-      /**
-       * TODO [AuthService / UsersService]:
-       * Обрабатывать ошибку уникальности email как ConflictException (HTTP 409).
-       * Сейчас: QueryFailedError → 500 Internal Server Error.
-       * Нужно: перехватывать QueryFailedError с кодом '23505' и бросать ConflictException.
-       */
+      await request(server).post('/auth/register').send(testUser).expect(409);
     });
   });
 
@@ -190,9 +185,12 @@ describe('AuthController (e2e)', () => {
        */
 
       /**
-       * TODO [AuthService.logout]:
-       * Убедиться, что refresh-токен действительно обнуляется в БД.
-       * (Предполагается, что это уже делается, но без проверки в стратегии — бесполезно.)
+      * TODO [AuthService.logout]:
+      * Убедиться, что refresh-токен действительно обнуляется в БД.
+      * (Предполагается, что это уже делается, но без проверки в стратегии — бесполезно.)
+          RolandSallaz
+          3 days ago
+          Это лучше в стратегии
        */
     });
 
