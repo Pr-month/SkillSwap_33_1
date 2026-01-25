@@ -126,35 +126,37 @@ describe('useShare', () => {
     expect(success).toBe(true);
   });
 
-  test('share возвращает false при ошибке navigator.share', async () => {
-    const mockShare = vi.fn().mockRejectedValue(new Error('fail'));
+  test('share возвращает false при ошибке fallbackShare', async () => {
+    const errorClipboard = { 
+      writeText: vi.fn().mockRejectedValue(new Error('fail'))  // ✅ Promise.reject
+    };
+
     global.navigator = {
       ...originalNavigator,
-      share: mockShare,
+      clipboard: errorClipboard,
     } as unknown as Navigator;
 
     const { share } = renderHook();
 
-    const success = await act(() => share(shareData));
+    const success = await act(async () => share(shareData));
 
-    expect(success).toBe(false);
+    expect(errorClipboard.writeText).toHaveBeenCalledWith(shareData.url);  // ✅
+    expect(success).toBe(false);  // ✅ Правильно!
+    expect(mockAlert).not.toHaveBeenCalled();  // ✅ Нет ложного alert!
   });
 
-  test('share возвращает false при ошибке fallbackShare', async () => {
-    // fallbackShare ожидает синхронный throw, а не промис
-    mockClipboard.writeText.mockImplementation(() => {
-      throw new Error('fail');
-    });
+
+  test('share возвращает false при ошибке navigator.share', async () => {
+    const errorShare = vi.fn().mockRejectedValue(new Error('fail'));
     global.navigator = {
       ...originalNavigator,
-      clipboard: mockClipboard,
+      share: errorShare,
     } as unknown as Navigator;
 
     const { share } = renderHook();
+    const success = await act(async () => share(shareData));
 
-    const success = await act(() => share(shareData));
-
-    expect(success).toBe(false);
-    expect(global.alert).not.toHaveBeenCalled();
+    expect(errorShare).toHaveBeenCalledWith(shareData);
+    expect(success).toBe(false);  // ✅ Правильно!
   });
 });

@@ -12,18 +12,13 @@ interface UseShareReturn {
 }
 
 export const useShare = (): UseShareReturn => {
-  const isSupported = useCallback(() => {
-    return !!navigator.share;
-  }, []);
+  const isSupported = useCallback(() => !!navigator.share, []);
 
-  const fallbackShare = useCallback((data: ShareData): boolean => {
+  const fallbackShare = useCallback(async (data: ShareData): Promise<boolean> => {
     try {
-      // Копируем URL в буфер обмена
-      if (data.url) {
-        navigator.clipboard.writeText(data.url);
+      if (data.url && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(data.url);
       }
-
-      // Показываем уведомление пользователю
       alert(`Ссылка скопирована в буфер обмена:\n${data.url || data.title}`);
       return true;
     } catch (error) {
@@ -32,27 +27,23 @@ export const useShare = (): UseShareReturn => {
     }
   }, []);
 
-  const share = useCallback(
-    async (data: ShareData): Promise<boolean> => {
-      try {
-        if (navigator.share) {
-          await navigator.share({
-            title: data.title,
-            text: data.text,
-            url: data.url,
-          });
-          return true;
-        } else {
-          // Fallback для браузеров, которые не поддерживают Web Share API
-          return fallbackShare(data);
-        }
-      } catch (error) {
-        console.error('Share failed:', error);
-        return false;
+  const share = useCallback(async (data: ShareData): Promise<boolean> => {
+    try {
+      if (navigator.share) {
+        // ✅ Фикс: полный объект data
+        await navigator.share({
+          title: data.title,
+          text: data.text,
+          url: data.url,
+        });
+        return true;
       }
-    },
-    [fallbackShare],
-  );
+      return await fallbackShare(data);  // ✅ await
+    } catch (error) {
+      console.error('Share failed:', error);
+      return false;
+    }
+  }, [fallbackShare]);
 
   return {
     share,

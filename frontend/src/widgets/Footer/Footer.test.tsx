@@ -19,7 +19,7 @@ describe('Footer Component', () => {
   it('contains copyright information', () => {
     renderFooter();
     // Обновляем селектор для текущего текста в футере
-    expect(screen.getByText(/SkillSwap — 2025/i)).toBeInTheDocument();
+    expect(screen.getByText(/SkillSwap — 2026/i)).toBeInTheDocument();
   });
 
   it('contains social media links', () => {
