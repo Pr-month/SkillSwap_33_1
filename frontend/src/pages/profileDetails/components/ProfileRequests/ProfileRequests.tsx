@@ -6,20 +6,24 @@ import { Button } from '@/shared/ui/button/button';
 import { useNavigate } from 'react-router-dom';
 import styles from './ProfileRequests.module.css';
 import { useAuth } from '@/features/auth/context/AuthContext';
+import { useEffect } from 'react';
 
 export function ProfileRequests() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Если пользователь не авторизован - перенаправляем на логин
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
-
+  // ✅ useSelector ПЕРВЫМ!
   const allRequests = useSelector(selectToUserExchangeRequest);
-  // Фильтруем запросы только для текущего пользователя
-  const requests = allRequests.filter(request => request.toUserId === user.id);
+  
+  // ✅ Ранний редирект БЕЗ return (не прерывает hooks)
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  // ✅ Логика после всех hooks
+  const requests = allRequests.filter(request => request.toUserId === user?.id || false);
 
   if (requests.length === 0) {
     return (

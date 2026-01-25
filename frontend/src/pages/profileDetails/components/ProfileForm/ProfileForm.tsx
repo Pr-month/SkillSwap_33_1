@@ -159,7 +159,7 @@ export function ProfileForm() {
     } catch (err) {
       setPasswordErrors(prev => ({
         ...prev,
-        form: 'Ошибка при изменении пароля. Проверьте текущий пароль.',
+        form: `Ошибка ${err} при изменении пароля. Проверьте текущий пароль.`,
       }));
     } finally {
       setIsLoading(false);

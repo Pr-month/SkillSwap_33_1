@@ -14,7 +14,7 @@ import { getSkills } from '@/services/slices/skillsSlice';
 import Loader from '@/shared/ui/Loader/loader';
 const ProfileDetailsPage = lazy(
   () =>
-    new Promise<{ default: ComponentType<any> }>(resolve => {
+    new Promise<{ default: ComponentType<unknown> }>(resolve => {
       setTimeout(() => {
         import('@/pages/profileDetails/ProfileDetailsPage').then(module =>
           resolve({ default: module.default }),

@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { AuthProvider } from '@/features/auth/context/AuthContext';
+import { AuthProvider } from '@/features/auth/context/AuthProvider';
 import { UserPanel } from './UserPanel';
 import { vi } from 'vitest';
 import userEvent from '@testing-library/user-event';

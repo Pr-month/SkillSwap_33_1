@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach, beforeAll } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { Header } from './Header';
-import { AuthProvider } from '../../features/auth/context/AuthContext';
+import { AuthProvider } from '../../features/auth/context/AuthProvider';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { catalogReducer } from '@/services/slices/catalogSlice';

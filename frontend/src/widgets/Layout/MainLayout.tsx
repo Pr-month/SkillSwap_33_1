@@ -1,4 +1,4 @@
-import { AuthProvider } from '@/features/auth/context/AuthContext';
+import { AuthProvider } from '@/features/auth/context/AuthProvider';
 import { Header } from '@/widgets/Header/Header';
 import { Footer } from '@/widgets/Footer/Footer';
 import { Outlet } from 'react-router-dom';

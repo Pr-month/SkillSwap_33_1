@@ -38,13 +38,19 @@ const meta: Meta<typeof TextInput> = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+type TextInputProps = Parameters<typeof TextInput>[0]; 
+type StoryArgs = Partial<TextInputProps>;
 
 // Wrapper component для контроля состояния
-const TextInputWithState = (args: any) => {
+const TextInputWithState = (args:  StoryArgs) => {
   const [value, setValue] = useState(args.value || '');
 
   return (
     <TextInput
+      id={args.id || 'storybook-input'}           // ✅ Fallback required
+      title={args.title || 'Storybook Input'}    // ✅ Fallback required
+      placeholder={args.placeholder || ''}       // ✅ Fallback string!
+      type={args.type || 'text'}                 // ✅ Fallback!
       {...args}
       value={value}
       onChange={e => {

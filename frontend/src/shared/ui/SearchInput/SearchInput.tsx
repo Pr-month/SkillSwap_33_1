@@ -16,7 +16,7 @@ export const SearchInput = ({ placeholder, value, onSearch }: SearchInputProps) 
     if (value !== localValue) {
       setLocalValue(value);
     }
-  }, [value]);
+  }, [value, localValue]);
 
   useEffect(() => {
     onSearch(debouncedValue);

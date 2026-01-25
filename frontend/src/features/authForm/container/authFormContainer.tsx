@@ -1,6 +1,6 @@
 import { PAGE_TEXTS } from '@/features/authForm/ui/authForm';
 import { AuthFormUI } from '@/features/authForm/ui/authFormUI';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from '@/services/store/store';
 import { stepActions } from '@/services/slices/stepSlice';
 import { loginUser } from '@/services/thunk/authUser';
@@ -37,7 +37,7 @@ export const AuthFormContainer = ({ isFirstStage = true }) => {
     return '';
   };
 
-  const validateField = () => {
+  const validateField = useCallback(() => {
     const newErrors = {
       email: touched.email ? validateEmail(email) : '',
       password: touched.password ? validatePassword(password) : '',
@@ -64,13 +64,13 @@ export const AuthFormContainer = ({ isFirstStage = true }) => {
         form: '',
       });
     }
-  };
+  }, [email, password, touched.email, touched.password, errors.form]);
 
   useEffect(() => {
     if (touched.email || touched.password) {
       validateField();
     }
-  }, [email, password, touched.email, touched.password]);
+  }, [touched.email, touched.password, validateField]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
