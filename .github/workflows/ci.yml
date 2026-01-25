@@ -8,28 +8,9 @@ jobs:
   frontend-lint:
     name: Frontend Lint (ESLint + Stylelint)
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'  # Авто-кэш ~/.npm
-
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Run ESLint
-        run: npm run lint  # Или ci:lint с --max-warnings 0
-
-      - name: Run Stylelint
-        run: npm run stylelint:check
-
-  frontend-unit-tests:
-    name: Frontend Unit Tests (Vitest)
-    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend  # Основная папка для всех run
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,12 +20,39 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json  # Кэш именно frontend
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run ESLint
+        run: npm run lint  # Или ci:lint --max-warnings 0
+
+      - name: Run Stylelint
+        run: npm run stylelint:check
+
+  frontend-unit-tests:
+    name: Frontend Unit Tests (Vitest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
       - name: Run Vitest
-        run: npm run test  # С --coverage если нужно
+        run: npm run test  # С --coverage для отчёта
   lint:
     name: Run Linter
     runs-on: ubuntu-latest
