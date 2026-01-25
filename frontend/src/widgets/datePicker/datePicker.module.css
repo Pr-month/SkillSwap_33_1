@@ -13,14 +13,14 @@
   z-index: 2;
   background-color: var(--color-card);
 }
-
+/* stylelint-disable-next-line selector-pseudo-class-no-unknown */
 .datePickerContainer :global(.rdp-root) {
   --rdp-accent-color: var(--color-text);
   --rdp-day-height: 32px;
   --rdp-day-width: 32px;
-  --rdp-day_button-height: 32px;
-  --rdp-day_button-width: 32px;
-  --rdp-months-gap: 0px;
+  --rdp-day-button-height: 32px;
+  --rdp-day-button-width: 32px;
+  --rdp-months-gap: 0;
 }
 
 .nav {
@@ -69,7 +69,7 @@
 
 .day {
   font-size: 12px;
-  padding: 0px;
+  padding: 0;
 }
 
 .selected {

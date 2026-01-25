@@ -6,7 +6,7 @@
   margin: 0 auto;
   padding: 20px;
   border-radius: 12px;
-  background-color: var(--cardInput, #ffffff);
+  background-color: var(--card-input, #fff);
 }
 
 .header {
@@ -20,7 +20,7 @@
   position: relative;
   background: none;
   border: none;
-  color: var(--textLink-buttonPressed, #508826);
+  color: var(--textlink-button-pressed, #508826);
   cursor: pointer;
   line-height: inherit;
   padding-inline-start: 0;
@@ -38,12 +38,11 @@
   height: 24px;
   mask-image: url('../../app/assets/static/images/icons/cross.svg');
   mask-repeat: no-repeat;
-  background-color: currentColor;
+  background-color: currentcolor;
 }
 
 .title {
   margin: 0;
-
   line-height: 28px;
   color: var(--text, #253017);
   font-weight: 500;

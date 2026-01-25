@@ -23,7 +23,7 @@
 .radioDot {
   position: absolute;
   background-color: var(--text, #000);
-  mask-image: url(../../../app/assets/static/images/icons/radiobutton-empty.svg);
+  mask-image: url("../../../app/assets/static/images/icons/radiobutton-empty.svg");
   left: 0;
   height: 24px;
   width: 24px;
@@ -31,8 +31,8 @@
 }
 
 .hiddenRadio:checked + .customRadio .radioDot {
-  background-color: var(--textLink-buttonPressed, #508826);
-  mask-image: url(../../../app/assets/static/images/icons/radiobutton-active.svg);
+  background-color: var(--textlink-button-pressed, #508826);
+  mask-image: url("../../../app/assets/static/images/icons/radiobutton-active.svg");
 }
 
 .labelText {

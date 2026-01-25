@@ -9,7 +9,7 @@
   max-height: 689px;
 }
 
-.i con {
+.icon {
   max-width: 300px;
   max-height: 300px;
 }
@@ -23,9 +23,9 @@
 }
 
 .infoBlockHeader {
-  font-family: Jost;
+  font-family: Jost, sans-serif;
   font-weight: 500;
-  font-style: Medium;
+  font-style: medium;
   font-size: 24px;
   line-height: 28px;
   text-align: center;

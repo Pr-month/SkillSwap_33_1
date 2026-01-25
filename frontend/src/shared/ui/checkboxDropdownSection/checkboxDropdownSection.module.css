@@ -44,7 +44,7 @@
 
 .categoryItem:hover .categoryChevron,
 .categoryItem.expanded .categoryChevron,
-.categoryChevron:hover {
+.category_chevron:hover {
   opacity: 1;
 }
 
@@ -73,7 +73,7 @@
   align-items: center;
   gap: 4px;
   cursor: pointer;
-  color: var(--textLink-buttonPressed, #508826);
+  color: var(--textlink-button-pressed, #508826);
 }
 
 .chevron {

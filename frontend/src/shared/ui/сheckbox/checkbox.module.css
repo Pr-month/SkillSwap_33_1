@@ -30,19 +30,19 @@
 
 .customCheckbox.empty .checkmark {
   background-color: var(--text, #000);
-  mask-image: url(../../../app/assets/static/images/icons/checkbox-empty.svg);
+  mask-image: url('../../../app/assets/static/images/icons/checkbox-empty.svg');
   mask-repeat: no-repeat;
 }
 
 .customCheckbox.done .checkmark {
   background-color: var(--accent, #abd27a);
-  mask-image: url(../../../app/assets/static/images/icons/checkbox-done.svg);
+  mask-image: url('../../../app/assets/static/images/icons/checkbox-done.svg');
   mask-repeat: no-repeat;
 }
 
 .customCheckbox.remove .checkmark {
   background-color: var(--accent, #abd27a);
-  mask-image: url(../../../app/assets/static/images/icons/checkbox-remove.svg);
+  mask-image: url('../../../app/assets/static/images/icons/checkbox-remove.svg');
   mask-repeat: no-repeat;
 }
 

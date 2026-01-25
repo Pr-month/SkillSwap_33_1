@@ -44,7 +44,6 @@
   background-image: url('@/app/assets/static/images/icons/user-circle.svg');
   width: 72px;
   height: 72px;
-  background-size: 54px 54px;
   background-repeat: no-repeat;
   background-size: cover;
 }

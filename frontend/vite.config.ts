@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
+import stylelint from 'vite-plugin-stylelint';
 import path from "path";
 
 function excludeStoriesInBuild() {
@@ -29,6 +30,7 @@ export default defineConfig(({ command }) => {
       react(),
       tsconfigPaths(),
       ...(isBuild ? [excludeStoriesInBuild()] : []),
+      stylelint()
     ],
     resolve: {
       alias: {

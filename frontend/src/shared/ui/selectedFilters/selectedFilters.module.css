@@ -9,7 +9,7 @@
   display: inline-flex;
   align-items: center;
   padding: 12px 24px;
-  background-color: var(--cardInput, #ffffff);
+  background-color: var(--card-input, #fff);
   border-radius: 12px;
   color: var(--text, #253017);
 }
