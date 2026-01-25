@@ -5,6 +5,8 @@ import {
   IGlossaryProvider,
   SearchParams,
 } from '../interfaces/glossary-provider.interface';
+import { CreateCityDto } from 'src/cities/dto/create-city.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class CitiesGlossaryProvider implements IGlossaryProvider<CityDto> {
@@ -25,5 +27,11 @@ export class CitiesGlossaryProvider implements IGlossaryProvider<CityDto> {
 
   findOne(id: string) {
     return this.citiesService.findOneById(id);
+  }
+
+  create(data: unknown) {
+    const dto = plainToInstance(CreateCityDto, data);
+
+    return this.citiesService.create(dto);
   }
 }

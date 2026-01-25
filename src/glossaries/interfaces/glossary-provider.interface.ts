@@ -4,9 +4,10 @@ export interface SearchParams {
   search: string;
 }
 
-export interface IGlossaryProvider<TItem = any> {
+export interface IGlossaryProvider<TItem = unknown> {
   readonly code: string;
   getMetadata?(): Promise<{ name: string; description?: string }>;
   findAll(params?: SearchParams): Promise<{ items: TItem[]; total: number }>;
   findOne(id: string): Promise<TItem | null>;
+  create(data: unknown): Promise<TItem>;
 }
