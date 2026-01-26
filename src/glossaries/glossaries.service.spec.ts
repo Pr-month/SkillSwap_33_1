@@ -17,6 +17,9 @@ class MockProvider implements IGlossaryProvider {
   findOne(id: string) {
     return Promise.resolve(id === '1' ? { id: '1', name: 'Test' } : null);
   }
+  create(data: unknown) {
+    return Promise.resolve(data);
+  }
 }
 
 class MockProviderWithoutMetadata implements IGlossaryProvider {
@@ -26,6 +29,9 @@ class MockProviderWithoutMetadata implements IGlossaryProvider {
   }
   findOne() {
     return Promise.resolve(null);
+  }
+  create(data: unknown) {
+    return Promise.resolve(data);
   }
 }
 
@@ -89,8 +95,9 @@ describe('GlossariesService', () => {
     });
 
     it('should return null for non-existent glossary', async () => {
-      const result = await service.getGlossaryMetadata('unknown');
-      expect(result).toBeNull();
+      await expect(service.getGlossaryMetadata('unknown')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

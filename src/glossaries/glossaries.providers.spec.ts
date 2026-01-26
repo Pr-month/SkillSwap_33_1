@@ -26,6 +26,11 @@ describe('GLOSSARY_PROVIDERS', () => {
       getMetadata: jest
         .fn()
         .mockResolvedValue({ name: 'Cities', description: '' }),
+      create: jest.fn().mockRejectedValue({
+        id: '64c3debf-0bf7-449f-8610-a0ca0632aacf',
+        name: 'Москва',
+        population: 24562347856,
+      }),
     };
 
     const result = mapProvider.useFactory(mockCitiesProvider);

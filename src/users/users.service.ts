@@ -80,8 +80,9 @@ export class UsersService {
       patch.city = { id: patch.city };
     }
 
-    const saved = await this.usersRepository.save({ ...user, ...patch });
-    return this.filterUser(saved);
+    await this.usersRepository.save({ ...user, ...patch });
+
+    return this.findOne(id);
   }
 
   async remove(id: string): Promise<{ message: string }> {

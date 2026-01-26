@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { City } from './entities/city.entity';
 import { Repository } from 'typeorm';
 import { SearchParams } from 'src/glossaries/interfaces/glossary-provider.interface';
+import { CreateCityDto } from './dto/create-city.dto';
 
 @Injectable()
 export class CitiesService {
@@ -55,6 +56,11 @@ export class CitiesService {
   async findOneById(id: string): Promise<CityDto | null> {
     const city = await this.citiesRepository.findOneBy({ id });
     return city ? this.toDto(city) : null;
+  }
+
+  async create(data: CreateCityDto): Promise<CityDto> {
+    const saved = await this.citiesRepository.save(data);
+    return this.toDto(saved);
   }
 
   private toDto(city: Pick<City, 'id' | 'name'> & Partial<City>): CityDto {
