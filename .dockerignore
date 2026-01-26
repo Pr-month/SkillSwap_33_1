@@ -1,5 +1,5 @@
-frontend/
-frontend/*
+/*
+frontend
 node_modules
 npm-debug.log*
 .git
@@ -11,3 +11,4 @@ coverage
 .nyc_output
 dist
 .env.local
+*/

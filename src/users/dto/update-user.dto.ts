@@ -21,7 +21,6 @@ export class UpdateUserDto {
   @IsString()
   @Length(2, 50, { message: 'Ваше имя должно быть от 2 до 50 символов' })
   name?: string;
-
   @ApiProperty({
     example: 'Backend-разработчик из Москвы',
     description: 'Информация о пользователе (до 1000 символов)',
