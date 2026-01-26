@@ -36,8 +36,11 @@ export class GlossariesService {
     return Promise.all(promises);
   }
 
-  getGlossary(code: string): IGlossaryProvider | undefined {
-    return this.providers.get(code);
+  private getGlossary(code: string): IGlossaryProvider {
+    const provider = this.providers.get(code);
+    if (!provider) throw new NotFoundException(`Glossary '${code}' not found`);
+
+    return provider;
   }
 
   async getGlossaryMetadata(code: string) {
@@ -66,6 +69,9 @@ export class GlossariesService {
         'Номер страницы или лимит элементов не могут быть меньше 0',
       );
 
+    params.page = Math.floor(params.page);
+    params.limit = Math.floor(params.limit);
+
     const provider = this.getGlossary(code);
 
     if (!provider) throw new NotFoundException(`Glossary '${code}' not found`);
@@ -75,7 +81,11 @@ export class GlossariesService {
 
   async getItem(code: string, id: string): Promise<unknown> {
     const provider = this.getGlossary(code);
-    if (!provider) throw new NotFoundException(`Glossary '${code}' not found`);
     return provider.findOne(id);
+  }
+
+  async postItem(code: string, data: unknown) {
+    const provider = this.getGlossary(code);
+    return provider.create(data);
   }
 }

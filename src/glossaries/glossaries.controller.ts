@@ -5,6 +5,8 @@ import {
   Query,
   NotFoundException,
   ParseIntPipe,
+  Post,
+  Body,
 } from '@nestjs/common';
 import { GlossariesService } from './glossaries.service';
 import {
@@ -71,6 +73,11 @@ export class GlossariesController {
       );
     }
     return item;
+  }
+
+  @Post(':code/items')
+  async postItem(@Param('code') code: string, @Body() data: unknown) {
+    return this.glossariesService.postItem(code, data);
   }
 }
 /*

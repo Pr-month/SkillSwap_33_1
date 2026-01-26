@@ -14,6 +14,7 @@ import { AccessTokenGuard } from '../src/auth/guards/accessToken.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { UserResponseDto } from '../src/users/dto/get-user-response.dto';
+import { cities } from 'src/scripts/test/test_cities';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -102,7 +103,7 @@ describe('UsersController (e2e)', () => {
     it('PATCH /users/me should update user profile', async () => {
       const updateDto: UpdateUserDto = {
         name: 'Иван Иванов',
-        city: 'Москва',
+        city: cities[0].id,
         about: 'Backend-разработчик',
       };
 

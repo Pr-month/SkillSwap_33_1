@@ -34,7 +34,7 @@ export class User {
   @Column({ type: 'date', nullable: true })
   birthdate: Date;
 
-  @ManyToOne(() => City)
+  @ManyToOne(() => City, { eager: true })
   city: City;
 
   @Column({ type: 'varchar', nullable: true })
