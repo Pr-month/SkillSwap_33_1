@@ -1,28 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, Min, IsObject } from 'class-validator';
-
-class CoordsDto {
-  @ApiProperty({ example: '52.65' })
-  @IsString()
-  lat: string;
-
-  @ApiProperty({ example: '90.083333333333' })
-  @IsString()
-  lon: string;
-}
+import { IsNumber, IsString, Min } from 'class-validator';
 
 export class CityDto {
   @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
   @IsString()
   id: string;
-
-  @ApiProperty({ type: CoordsDto })
-  @IsObject()
-  coords: CoordsDto;
-
-  @ApiProperty({ example: 'Сибирский' })
-  @IsString()
-  district: string;
 
   @ApiProperty({ example: 'Абаза' })
   @IsString()
@@ -31,9 +13,5 @@ export class CityDto {
   @ApiProperty({ example: 12272 })
   @IsNumber()
   @Min(0)
-  population: number;
-
-  @ApiProperty({ example: 'Хакасия' })
-  @IsString()
-  subject: string;
+  population?: number;
 }

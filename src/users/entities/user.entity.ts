@@ -5,10 +5,12 @@ import {
   OneToMany,
   JoinTable,
   ManyToMany,
+  ManyToOne,
 } from 'typeorm';
 import { Gender } from '../users.enums';
 import { Skill } from '../../skills/entities/skill.entity';
 import { UserRole } from '../../auth/roles.enum';
+import { City } from 'src/cities/entities/city.entity';
 
 // import { Category } from 'src/categories/entities/category.entity';
 
@@ -32,8 +34,8 @@ export class User {
   @Column({ type: 'date', nullable: true })
   birthdate: Date;
 
-  @Column({ type: 'varchar', nullable: true })
-  city: string;
+  @ManyToOne(() => City, { eager: true })
+  city: City;
 
   @Column({ type: 'varchar', nullable: true })
   gender: Gender;

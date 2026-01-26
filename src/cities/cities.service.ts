@@ -1,69 +1,73 @@
 import { Injectable } from '@nestjs/common';
-import { allCitiesData } from './data';
-import { City } from './interfaces/city.interface';
 import { CityDto } from './dto/city.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { City } from './entities/city.entity';
+import { Repository } from 'typeorm';
+import { SearchParams } from 'src/glossaries/interfaces/glossary-provider.interface';
+import { CreateCityDto } from './dto/create-city.dto';
 
 @Injectable()
 export class CitiesService {
-  private readonly cities: readonly City[];
+  constructor(
+    @InjectRepository(City)
+    private citiesRepository: Repository<City>,
+  ) {}
 
-  constructor() {
-    this.cities = allCitiesData;
-  }
+  // findAllRaw(): readonly City[] {
+  //   return this.cities;
+  // }
 
-  findAllRaw(): readonly City[] {
-    return this.cities;
-  }
+  // findBySubject(subject: string): City[] {
+  //   return this.cities.filter((city) => city.subject === subject);
+  // }
 
-  findBySubject(subject: string): City[] {
-    return this.cities.filter((city) => city.subject === subject);
-  }
+  // findByDistrict(district: string): City[] {
+  //   return this.cities.filter((city) => city.district === district);
+  // }
 
-  findByDistrict(district: string): City[] {
-    return this.cities.filter((city) => city.district === district);
-  }
+  // findByName(name: string): City | undefined {
+  //   return this.cities.find((city) => city.name === name);
+  // }
 
-  findByName(name: string): City | undefined {
-    return this.cities.find((city) => city.name === name);
-  }
+  // searchByName(query: string): City[] {
+  //   const q = query.trim().toLowerCase();
+  //   return this.cities.filter((city) => city.name.toLowerCase().includes(q));
+  // }
 
-  searchByName(query: string): City[] {
-    const q = query.trim().toLowerCase();
-    return this.cities.filter((city) => city.name.toLowerCase().includes(q));
-  }
+  async findAllPaginated({ page, limit, search }: SearchParams) {
+    const pattern = search.replace(/[^а-яёА-ЯЁ]/g, '[^а-яёА-ЯЁ]');
+    const fullPattern = `.*${pattern}.*`;
 
-  findAllPaginated(params: { page?: number; limit?: number; search?: string }) {
-    let items = this.cities;
-
-    if (params.search) {
-      items = this.searchByName(params.search);
-    }
-
-    const total = items.length;
-    const page = Math.max(1, params.page ?? 1);
-    const limit = Math.max(1, Math.min(100, params.limit ?? 10));
-    const start = (page - 1) * limit;
-    const paginated = items.slice(start, start + limit);
+    const cities = await this.citiesRepository
+      .createQueryBuilder()
+      .where('name ~* :pattern', { pattern: fullPattern })
+      .select(['id', 'name'])
+      .orderBy('population', 'DESC')
+      .limit(limit)
+      .offset(limit * page)
+      .getRawMany<Pick<City, 'id' | 'name'>>();
 
     return {
-      items: paginated.map((city) => this.toDto(city)),
-      total,
+      items: cities.map((city) => this.toDto(city)),
+      total: await this.citiesRepository.count(),
     };
   }
 
-  findOneById(id: string): CityDto | null {
-    const city = this.cities.find((c) => c.id === id);
+  async findOneById(id: string): Promise<CityDto | null> {
+    const city = await this.citiesRepository.findOneBy({ id });
     return city ? this.toDto(city) : null;
   }
 
-  private toDto(city: City): CityDto {
+  async create(data: CreateCityDto): Promise<CityDto> {
+    const saved = await this.citiesRepository.save(data);
+    return this.toDto(saved);
+  }
+
+  private toDto(city: Pick<City, 'id' | 'name'> & Partial<City>): CityDto {
     return {
       id: city.id,
-      coords: { lat: city.coords.lat, lon: city.coords.lon },
-      district: city.district,
       name: city.name,
       population: city.population,
-      subject: city.subject,
     };
   }
 }

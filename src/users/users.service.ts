@@ -26,7 +26,7 @@ export class UsersService {
       email: user.email,
       about: user.about,
       birthdate: user.birthdate,
-      city: user.city,
+      city: user.city?.name,
       gender: user.gender,
       avatar: user.avatar,
       role: user.role,
@@ -72,12 +72,17 @@ export class UsersService {
     const user = await this.findUserById(id);
 
     // забираем только ключи, реально пришедшие в запросе (не undefined)
-    const patch = Object.fromEntries(
+    const patch = Object.fromEntries<unknown>(
       Object.entries(updateUserDto).filter(([, v]) => v !== undefined),
     );
 
-    const saved = await this.usersRepository.save({ ...user, ...patch });
-    return this.filterUser(saved);
+    if (patch.city) {
+      patch.city = { id: patch.city };
+    }
+
+    await this.usersRepository.save({ ...user, ...patch });
+
+    return this.findOne(id);
   }
 
   async remove(id: string): Promise<{ message: string }> {

@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CitiesService } from '../../cities/cities.service';
 import { CityDto } from '../../cities/dto/city.dto';
-import { IGlossaryProvider } from '../interfaces/glossary-provider.interface';
+import {
+  IGlossaryProvider,
+  SearchParams,
+} from '../interfaces/glossary-provider.interface';
+import { CreateCityDto } from 'src/cities/dto/create-city.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class CitiesGlossaryProvider implements IGlossaryProvider<CityDto> {
@@ -16,13 +21,17 @@ export class CitiesGlossaryProvider implements IGlossaryProvider<CityDto> {
     });
   }
 
-  findAll(params: { page?: number; limit?: number; search?: string }) {
-    const result = this.citiesService.findAllPaginated(params);
-    return Promise.resolve(result);
+  findAll(params: SearchParams) {
+    return this.citiesService.findAllPaginated(params);
   }
 
   findOne(id: string) {
-    const result = this.citiesService.findOneById(id);
-    return Promise.resolve(result);
+    return this.citiesService.findOneById(id);
+  }
+
+  create(data: unknown) {
+    const dto = plainToInstance(CreateCityDto, data);
+
+    return this.citiesService.create(dto);
   }
 }
