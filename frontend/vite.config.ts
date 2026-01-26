@@ -29,8 +29,7 @@ export default defineConfig(({ command }) => {
     plugins: [
       react(),
       tsconfigPaths(),
-      ...(isBuild ? [excludeStoriesInBuild()] : []),
-      stylelint()
+      ...(isBuild ? [excludeStoriesInBuild()] : [])
     ],
     resolve: {
       alias: {
