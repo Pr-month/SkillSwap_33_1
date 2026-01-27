@@ -15,7 +15,7 @@ services:
 
   app:
     build:
-      context: .
+      context: ./backend
       target: development
     ports:
       - '3000:3000'
