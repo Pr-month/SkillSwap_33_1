@@ -2,13 +2,13 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
   IsString,
-  IsUrl,
   ArrayMaxSize,
   MaxLength,
   MinLength,
   IsOptional,
   IsUUID,
 } from 'class-validator';
+import { IsValidUrl } from '../../utils/custom-url-validator.util';
 
 export class CreateSkillDto {
   @ApiProperty({
@@ -61,7 +61,10 @@ export class CreateSkillDto {
   })
   @IsOptional()
   @IsArray()
-  @IsUrl({}, { each: true })
+  @IsValidUrl({
+    each: true,
+    message: 'Each value in images must be a URL address',
+  })
   @ArrayMaxSize(10)
   images?: string[] = [];
 }

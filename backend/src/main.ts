@@ -5,6 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { join } from 'path';
 import cookieParser from 'cookie-parser';
+import { useContainer } from 'class-validator';
 import { doubleCsrfProtection } from './csrf/csrf';
 import { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
@@ -17,6 +18,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
   const appConfig = configService.get<AppConfig>('APP_CONFIG');
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   app.use(helmet());
   app.use(cookieParser());
